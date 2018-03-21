@@ -1,0 +1,32 @@
+Package: fantaxtic
+Type: Package
+Title: Publication-Quality Plots from Phyloseq Data
+Version: 0.1.0
+Author: person("Guus Martijn", "Teunisse", email = "gmteunisse@gmail.com",
+    role = c("aut", "cre"))
+Description: This package is a set of wrapper functions for phyloseq and
+    ggplot2 that turns ordinary taxonomic count data into fantaxtic,
+    publication ready plots. Whereas most packages promise to deliver
+    figures that could be published directly, in practice they often are
+    standard plots output by ggplot2 using the minimal theme. Fantaxtic 
+    figures, however, come as completely stylized figures with pleasing 
+    colors and maximal plotting control. As the output figures are simply
+    ggplot2 objects, expert users can also manipulate the final output
+    to customize figures up to their desire.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 3.4.4), 
+    stats, 
+    grDevices,
+    ggplot2 (>= 2.2.1),
+    phyloseq (>= 1.22.3),
+    reshape2 (>= 1.4.3)
+Imports:
+    ggplot2 (>= 2.2.1),
+    phyloseq (>= 1.22.3),
+    reshape2 (>= 1.4.3)
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
