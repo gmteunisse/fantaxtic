@@ -36,6 +36,10 @@ name_taxa <- function(physeq_obj, label = "Unknown", other_label = NULL, species
         if (!is.null(other_label)){
           if (other_label %in%  x){
             tax_ranks <- x
+          } else {
+            if (species){
+              x[n] <- sprintf("%s %s", x[n-1], x[n])
+            }
           }
         } else {
           if (species){
