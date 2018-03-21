@@ -14,7 +14,7 @@ library(fantaxtic)
 ```
 
 # An example
-As an example, you can create a barplot using the GlobalPatterns data from the Phyloseq object.
+As an example, you can create a barplot using the GlobalPatterns data from the Phyloseq package.
 ```
 #Load data
 data(GlobalPatterns)
