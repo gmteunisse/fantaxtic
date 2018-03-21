@@ -21,6 +21,7 @@
 #' @export
 get_top_taxa <- function(physeq_obj, n, relative = TRUE, discard_other = FALSE, other_label = "Other"){
 
+  #Define a temporary physeq object
   ps_tmp <- physeq_obj
 
   #Rotate table if necessary
@@ -38,7 +39,7 @@ get_top_taxa <- function(physeq_obj, n, relative = TRUE, discard_other = FALSE, 
   if (discard_other){
     ps_tmp <- prune_taxa(abun_taxa, ps_tmp)
   } else {
-    to_merge <- rownames(otu_table(physeq_obj))
+    to_merge <- rownames(otu_table(ps_tmp))
     to_merge <- to_merge[!(to_merge %in% abun_taxa)]
     ps_tmp <- merge_taxa(ps_tmp, to_merge)
     tax_tbl <- tax_table(ps_tmp)
