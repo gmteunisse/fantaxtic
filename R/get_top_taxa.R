@@ -41,7 +41,7 @@ get_top_taxa <- function(physeq_obj, n, relative = TRUE, discard_other = FALSE, 
   } else {
     to_merge <- rownames(otu_table(ps_tmp))
     to_merge <- to_merge[!(to_merge %in% abun_taxa)]
-    ps_tmp <- merge_taxa(ps_tmp, to_merge)
+    ps_tmp <- merge_taxa(ps_tmp, to_merge, to_merge[1])
     tax_tbl <- tax_table(ps_tmp)
     indx <- which(row.names(tax_tbl) %in% to_merge)
     tax_tbl[indx,] <- other_label
