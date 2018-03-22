@@ -7,6 +7,7 @@ For now the package contains a sole plotting function, `fantaxtic_bar`, but Fant
 In the R console, type:
 ```
 #install.packages(devtools)
+library(devtools)
 devtools::install_github("gmteunisse/Fantaxtic")
 ```
 
