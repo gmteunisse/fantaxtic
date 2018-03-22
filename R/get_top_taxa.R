@@ -54,7 +54,6 @@ get_top_taxa <- function(physeq_obj, n, relative = TRUE, discard_other = FALSE, 
   } else {
     to_merge <- taxa_names(physeq_obj)
     to_merge <- to_merge[!(to_merge %in% abun_taxa)]
-    print(to_merge)
     physeq_obj <- merge_taxa(physeq_obj, to_merge)
     tax_tbl <- tax_table(physeq_obj)
     indx <- which(row.names(tax_tbl) %in% to_merge)
