@@ -52,7 +52,7 @@ get_top_taxa <- function(physeq_obj, n, relative = TRUE, discard_other = FALSE, 
   if (discard_other){
     physeq_obj <- prune_taxa(abun_taxa, physeq_obj)
   } else {
-    to_merge <- taxa_names(physeq)
+    to_merge <- taxa_names(physeq_obj)
     to_merge <- to_merge[!(to_merge %in% abun_taxa)]
     print(to_merge)
     physeq_obj <- merge_taxa(physeq_obj, to_merge)
