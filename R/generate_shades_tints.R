@@ -17,6 +17,9 @@
 #' gen_shades_tints(3, "blue")
 #' @export
 gen_shades_tints <- function(i, clr = "#6495ed"){
+  if (i == 0){
+    return(c())
+  }
   if (i == 1){
     return(clr)
   }
@@ -37,6 +40,9 @@ gen_shades_tints <- function(i, clr = "#6495ed"){
 #' \code{gen_shades} returns \code{i} shades of a base color.
 #' @rdname gen_shades_tints
 gen_shades <- function(i, clr = "#6495ed", incl.base = FALSE){
+  if (i == 0){
+    return(c())
+  }
   if (i == 1){
     return(clr)
   }
@@ -56,6 +62,9 @@ gen_shades <- function(i, clr = "#6495ed", incl.base = FALSE){
 #' \code{gen_tints} returns \code{i} tints of a base color.
 #' @rdname gen_shades_tints
 gen_tints <- function(i, clr = "#6495ed", incl.base = FALSE){
+  if (i == 0){
+    return(c())
+  }
   if (i == 1){
     return(clr)
   }

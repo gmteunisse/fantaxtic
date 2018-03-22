@@ -31,10 +31,12 @@
 #' @param order_alg The algorithm by which to order samples. One of \code{hclust}
 #' (hierarhical clustering; default), \code{as.is} (current order), \code{alph}
 #' (alphabetical) or \code{other.abnd} (abundance of the sum of "other" taxa).
+#' @param color_levels Character vector containing names of levels. Useful to
+#' enforce identical colors for levels across different plots.
 #' @param base_color The base color from which to generate colors.
 #' @param other_color The base color from which to generate shades for "other"
 #' taxa.
-#' @param color_by_palette A user specified palette to color the bars with. Replaces
+#' @param palette A user specified palette to color the bars with. Replaces
 #' \code{base_color}.
 #' @return A \code{ggplot2} object.
 #' @examples
@@ -62,12 +64,14 @@
 #'               order_alg = "other.abnd")
 #'
 #' #Add faceting by sample type
-#' fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", facet_by = "SampleType", other_label = "Other")
+#' fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family",
+#'               facet_by = "SampleType", other_label = "Other")
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
-                          gen_uniq_lbls = TRUE, other_label= NULL, order_alg = "hclust",
-                          base_color = "#6495ed", other_color = "#f3f3f3",
-                          color_by_pallete = NULL){
+                          gen_uniq_lbls = TRUE, other_label= NULL,
+                          order_alg = "hclust", color_levels = NULL,
+                          base_color = "#6495ed",
+                          other_color = "#f3f3f3", palette = NULL){
 
   #Check for subcoloring
   if (is.null(label_by)){
@@ -93,12 +97,6 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
 
   #Move Other taxa to the beginning and alter taxonomic annotations
   #of Other taxa
-  #if(!is.null(other_label)){
-  #  ordr <- which(tax_tbl[[color_by]] != other_label)
-  #  ordr <- c(which(tax_tbl[[color_by]] == other_label), ordr)
-  #  tax_tbl <- tax_tbl[ordr,]
-  #}
-
   if(!is.null(other_label)){
     main_ind <- which(!tax_tbl[[label_by]] %in% other_label)
     other_ind <- which(tax_tbl[[label_by]] %in% other_label)
@@ -110,9 +108,11 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   }
 
   #Refactor for legend ordering
-  tax_tbl[[color_by]] <- factor(tax_tbl[[color_by]], unique(tax_tbl[[color_by]]), ordered = T)
+  if (is.null(color_levels)){
+    color_levels <- unique(tax_tbl[[color_by]])
+  }
+  tax_tbl[[color_by]] <- factor(tax_tbl[[color_by]], color_levels, ordered = T)
   tax_tbl[[label_by]] <- factor(tax_tbl[[label_by]], unique(tax_tbl[[label_by]]), ordered = T)
-
 
   #Get the tax and OTU tables
   otu_tbl <- as.data.frame(otu_table(physeq_obj))
@@ -130,7 +130,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   }
 
   #Generate the required color palette
-  clr_pal <- gen_palette(clr_tbl = clr_tbl, clr_pal = color_by_pallete, base_clr = base_color)
+  clr_pal <- gen_palette(clr_tbl = clr_tbl, clr_pal = palette, base_clr = base_color)
   names(clr_pal) <- clr_tbl$Var1
   clr_pal <- as.vector(unlist(clr_pal))
   if(!is.null(other_label)){
