@@ -6,8 +6,8 @@
 \usage{
 fantaxtic_bar(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
   gen_uniq_lbls = TRUE, other_label = NULL, order_alg = "hclust",
-  base_color = "#6495ed", other_color = "#f3f3f3",
-  color_by_pallete = NULL)
+  color_levels = NULL, base_color = "#6495ed", other_color = "#f3f3f3",
+  palette = NULL)
 }
 \arguments{
 \item{physeq_obj}{A phyloseq object with an \code{otu_table}, a \code{tax_table}
@@ -30,12 +30,15 @@ facet the plots.}
 (hierarhical clustering; default), \code{as.is} (current order), \code{alph}
 (alphabetical) or \code{other.abnd} (abundance of the sum of "other" taxa).}
 
+\item{color_levels}{Character vector containing names of levels. Useful to
+enforce identical colors for levels across different plots.}
+
 \item{base_color}{The base color from which to generate colors.}
 
 \item{other_color}{The base color from which to generate shades for "other"
 taxa.}
 
-\item{color_by_palette}{A user specified palette to color the bars with. Replaces
+\item{palette}{A user specified palette to color the bars with. Replaces
 \code{base_color}.}
 }
 \value{
@@ -86,5 +89,6 @@ fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "O
               order_alg = "other.abnd")
 
 #Add faceting by sample type
-fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", facet_by = "SampleType", other_label = "Other")
+fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family",
+              facet_by = "SampleType", other_label = "Other")
 }
