@@ -1,10 +1,13 @@
 # Fantaxtic
-This is fantaxtic, a set of wrapper functions for phyloseq and ggplot2 that turns ordinary taxonomic count data into fantaxtic, publication ready plots. Whereas most packages promise to deliver figures that could be published directly, in practice they often are standard plots output by ggplot2 using the minimal theme. Fantaxtic figures, however, come as completely stylized figures with pleasing colors and maximal plotting control. As the output figures are simply ggplot2 objects, expert users can also manipulate the final output to customize figures up to their desire.
+This is fantaxtic, a set of wrapper functions for phyloseq and ggplot2 that turns ordinary taxonomic count data into fantaxtic, publication ready plots. Fantaxtic figures come as completely stylized figures with pleasing colors and maximal plotting control. As the output figures are simply ggplot2 objects, expert users can also manipulate the final output to customize figures up to their desire.
+
+For now the package contains a sole plotting function, `fantaxtic_bar`, but Fantaxtic will be extended with more functionality over time.
 
 # Installation
 In the R console, type:
 ```
-devtools::install_github("gmteunisse/Fantaxtic", build_vignettes = TRUE)
+#install.packages(devtools)
+devtools::install_github("gmteunisse/Fantaxtic")
 ```
 
 # Loading Fantaxtic
