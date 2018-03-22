@@ -21,12 +21,8 @@ fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "
 
 ## ---- include = T, fig.align = "center", fig.width = 8-------------------
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
-               gen_uniq_lbls = TRUE)
-
-## ---- include = T, fig.align = "center", fig.width = 8-------------------
-fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
                order_alg = "other.abnd")
 
-## ---- include = T, fig.align = "center", fig.width = 8-------------------
+## ---- include = T, fig.align = "center", fig.width = 8, fig.height = 10----
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", facet_by = "SampleType", other_label = "Other")
 

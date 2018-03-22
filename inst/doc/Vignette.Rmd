@@ -24,7 +24,7 @@ library(fantaxtic)
 data(GlobalPatterns)
 ```
 
-Now subset the data to the 10 most abundants OTUs or ASVs using the `get_top_taxa` function.
+Now subset the data to the 10 most abundants OTUs or ASVs using the `get_top_taxa` function. All other OTUs/ASVs will be collapsed into `"Other"` 
 ```{r, include = T, fig.align = "center", fig.width = 8}
 
 ps_tmp <- get_top_taxa(physeq_obj = GlobalPatterns, n = 10, relative = TRUE,
@@ -42,12 +42,6 @@ The output is a translation table of phylum to color, and a `ggplot2` plot.
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
 ```
 
-You can also color by family. As multiple OTUs/ASVs with the same name exist, you should make sure to generate unique labels.
-```{r, include = T, fig.align = "center", fig.width = 8}
-fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
-               gen_uniq_lbls = TRUE)
-```
-
 Perhaps a different sample ordering is more meaningful. Let's order the samples by the abundance of the collapsed category, labeled as "Other".
 ```{r, include = T, fig.align = "center", fig.width = 8}
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
@@ -55,6 +49,6 @@ fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "O
 ```
 
 Does the story change when we facet the plot by sample type? Add a faceting factor.
-```{r, include = T, fig.align = "center", fig.width = 8}
+```{r, include = T, fig.align = "center", fig.width = 8, fig.height = 10}
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", facet_by = "SampleType", other_label = "Other")
 ```
