@@ -31,7 +31,8 @@ facet the plots.}
 (alphabetical) or \code{other.abnd} (abundance of the sum of "other" taxa).}
 
 \item{color_levels}{Character vector containing names of levels. Useful to
-enforce identical colors for levels across different plots.}
+enforce identical colors for levels across different plots or to pair levels
+with colors.}
 
 \item{base_color}{The base color from which to generate colors.}
 
