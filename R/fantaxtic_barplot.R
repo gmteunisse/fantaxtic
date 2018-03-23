@@ -32,7 +32,8 @@
 #' (hierarhical clustering; default), \code{as.is} (current order), \code{alph}
 #' (alphabetical) or \code{other.abnd} (abundance of the sum of "other" taxa).
 #' @param color_levels Character vector containing names of levels. Useful to
-#' enforce identical colors for levels across different plots.
+#' enforce identical colors for levels across different plots or to pair levels
+#' with colors.
 #' @param base_color The base color from which to generate colors.
 #' @param other_color The base color from which to generate shades for "other"
 #' taxa.
@@ -87,13 +88,6 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     x[is.na(x)] <- "Unknown"
     return(x)
   }))
-
-  #Order alphabetically
-  ordr <- order(tax_tbl[[color_by]],
-                tax_tbl[[label_by]],
-                decreasing = F,
-                na.last = T)
-  tax_tbl <- tax_tbl[ordr,]
 
   #Move Other taxa to the beginning and alter taxonomic annotations
   #of Other taxa
