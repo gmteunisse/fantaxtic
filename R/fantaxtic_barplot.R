@@ -103,10 +103,18 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
 
   #Refactor for legend ordering
   if (is.null(color_levels)){
-    color_levels <- unique(tax_tbl[[color_by]])
+    tax_levels <- unique(tax_tbl[[color_by]])
+  } else {
+    if (is.null(other_label)){
+      tax_levels <- color_levels
+    } else {
+      tax_levels <- c(other_label, color_levels)
+    }
   }
-  tax_tbl[[color_by]] <- factor(tax_tbl[[color_by]], color_levels, ordered = T)
+  tax_tbl[[color_by]] <- factor(tax_tbl[[color_by]], tax_levels, ordered = T)
   tax_tbl[[label_by]] <- factor(tax_tbl[[label_by]], unique(tax_tbl[[label_by]]), ordered = T)
+  tax_tbl <- tax_tbl[order(tax_tbl[[color_by]]),]
+  View(tax_tbl)
 
   #Get the tax and OTU tables
   otu_tbl <- as.data.frame(otu_table(physeq_obj))
