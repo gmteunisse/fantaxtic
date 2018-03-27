@@ -25,6 +25,7 @@
 #' generate subcolors.
 #' @param facet_by The name of the factor in the \code{sample_data} by which to
 #' facet the plots.
+#' @param facet_cols The number of columns to use for faceting.
 #' @param gen_uniq_lbls Generate unique labels (default = \code{TRUE})?
 #' @param other_label A character vector specifying the names of taxa in
 #' \code{label_by} to use a specific color for.
@@ -68,7 +69,7 @@
 #' fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family",
 #'               facet_by = "SampleType", other_label = "Other")
 #' @export
-fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
+fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL, facet_cols = 1,
                           gen_uniq_lbls = TRUE, other_label= NULL,
                           order_alg = "hclust", color_levels = NULL,
                           base_color = "#6495ed",
@@ -212,7 +213,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
           text = element_text(family = "Helvetica", size = 8))
 
   if (!is.null(facet_by)){
-    p <- p + facet_wrap(~facet, scales = "free", ncol = 1)
+    p <- p + facet_wrap(~facet, scales = "free", ncol = facet_cols)
   }
 
   return(p)
