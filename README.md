@@ -3,6 +3,10 @@ This is fantaxtic, a set of wrapper functions for phyloseq and ggplot2 that turn
 
 For now the package contains a sole plotting function, `fantaxtic_bar`, and some helper functions, but Fantaxtic will be extended with more functionality over time.
 
+The function `fantaxtic_bar` created a barplot of relative abundances. Main colors are selected based on a user specified rank (for example Phylum), subcoloring (shades and tints) are generated automatically based on a user specified sub-rank (for example Genus). See the example below for details.
+
+Keywords: _taxonomy, phyloseq, relative, abundance, bar, ggplot2_
+
 # Installation
 In the R console, type:
 ```
