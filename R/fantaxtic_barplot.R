@@ -27,6 +27,7 @@
 #' facet the plots.
 #' @param grid_by The name of a second factor in the \code{sample_data} by which to
 #' facet to plots, resulting in a grid.
+#' @param facet_cols The number of columns to use for faceting.
 #' @param gen_uniq_lbls Generate unique labels (default = \code{TRUE})?
 #' @param other_label A character vector specifying the names of taxa in
 #' \code{label_by} to use a specific color for.
@@ -72,7 +73,7 @@
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
                           grid_by = NULL,
-                          gen_uniq_lbls = TRUE, other_label= NULL,
+                          facet_cols =  1, gen_uniq_lbls = TRUE, other_label= NULL,
                           order_alg = "hclust", color_levels = NULL,
                           base_color = "#6495ed",
                           other_color = "#f3f3f3", palette = NULL){
@@ -227,7 +228,6 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     }else{
       p <- p + facet_grid(facet~grid, scales = "free", space = "free_x")
     }
-
   }
 
   return(p)

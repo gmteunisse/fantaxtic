@@ -5,9 +5,9 @@
 \title{Generate a barplot of relative taxon abundances}
 \usage{
 fantaxtic_bar(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
-  grid_by = NULL, gen_uniq_lbls = TRUE, other_label = NULL,
-  order_alg = "hclust", color_levels = NULL, base_color = "#6495ed",
-  other_color = "#f3f3f3", palette = NULL)
+  grid_by = NULL, facet_cols = 1, gen_uniq_lbls = TRUE,
+  other_label = NULL, order_alg = "hclust", color_levels = NULL,
+  base_color = "#6495ed", other_color = "#f3f3f3", palette = NULL)
 }
 \arguments{
 \item{physeq_obj}{A phyloseq object with an \code{otu_table}, a \code{tax_table}
@@ -23,6 +23,8 @@ facet the plots.}
 
 \item{grid_by}{The name of a second factor in the \code{sample_data} by which to
 facet to plots, resulting in a grid.}
+
+\item{facet_cols}{The number of columns to use for faceting.}
 
 \item{gen_uniq_lbls}{Generate unique labels (default = \code{TRUE})?}
 
