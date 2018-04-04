@@ -226,7 +226,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     if(is.null(grid_by)){
       p <- p + facet_wrap(~facet, scales = "free", ncol = facet_cols)
     }else{
-      p <- p + facet_grid(facet~grid, scales = "free", space = "free_x")
+      p <- p + facet_wrap(~grid + facet, scales = "free")
     }
   }
 
