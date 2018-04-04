@@ -25,6 +25,8 @@
 #' generate subcolors.
 #' @param facet_by The name of the factor in the \code{sample_data} by which to
 #' facet the plots.
+#' @param grid_by The name of a second factor in the \code{sample_data} by which to
+#' facet to plots, resulting in a grid.
 #' @param gen_uniq_lbls Generate unique labels (default = \code{TRUE})?
 #' @param other_label A character vector specifying the names of taxa in
 #' \code{label_by} to use a specific color for.
@@ -69,6 +71,7 @@
 #'               facet_by = "SampleType", other_label = "Other")
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
+                          grid_by = NULL,
                           gen_uniq_lbls = TRUE, other_label= NULL,
                           order_alg = "hclust", color_levels = NULL,
                           base_color = "#6495ed",
@@ -186,6 +189,13 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     facet <- facet[ord]
     counts_long$facet <- facet
   }
+  if (!is.null(grid_by)){
+    grid <- as.data.frame(sample_data(physeq_obj))[[grid_by]]
+    names(grid) <- row.names(sample_data(physeq_obj))
+    ord <- match(counts_long$Sample, names(grid))
+    grid <- grid[ord]
+    counts_long$grid <- grid
+  }
 
   #Generate a plot
   p <- ggplot(counts_long, aes(x = Sample, y = Abundance, fill = label_by)) +
@@ -211,8 +221,13 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
           strip.text = element_text(family = "Helvetica", size = 8, face = "bold"),
           text = element_text(family = "Helvetica", size = 8))
 
-  if (!is.null(facet_by)){
-    p <- p + facet_wrap(~facet, scales = "free", ncol = 1)
+  if (!is.null(facet_by)) {
+    if(is.null(grid_by)){
+      p <- p + facet_wrap(~facet, scales = "free", ncol = facet_cols)
+    }else{
+      p <- p + facet_grid(facet~grid, scales = "free", space = "free_x")
+    }
+
   }
 
   return(p)

@@ -23,7 +23,7 @@
 gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
 
   #Define a palette
-  base_pal <- c("#6495ed", "#ff7256", "#edbc64", "#8470ff", "#f4a460", "#8ee5ee")
+  base_pal <- c("#6495ed", "#ff7256", "#edbc64", "#8470ff", "#B7EE7E", "#8ee5ee")
 
   #Define the number of variants required per color
   clr_vars <- clr_tbl[,2]

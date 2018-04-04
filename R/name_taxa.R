@@ -10,6 +10,8 @@
 #' @param physeq_obj A phyloseq object with a \code{tax_table}.
 #' @param unknown_label Label to prepend the taxon name with (default =
 #' \code{"Unknown"}).
+#' @param other_label The label(s) of samples whose names should not be altered.
+#' @param species Generate a Genus species label for the species level?
 #' @return A phyloseq object
 #' @examples
 #' data(GlobalPatterns)

@@ -10,6 +10,10 @@ name_taxa(physeq_obj, label = "Unknown", other_label = NULL,
 \arguments{
 \item{physeq_obj}{A phyloseq object with a \code{tax_table}.}
 
+\item{other_label}{The label(s) of samples whose names should not be altered.}
+
+\item{species}{Generate a Genus species label for the species level?}
+
 \item{unknown_label}{Label to prepend the taxon name with (default =
 \code{"Unknown"}).}
 }
