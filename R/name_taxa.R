@@ -31,8 +31,8 @@ name_taxa <- function(physeq_obj, label = "Unknown", other_label = NULL, species
       tax_ranks <- rep(label, n)
     } else {
       if (sum(is.na(x)) != 0){
-        i <- min(which(is.na(x)))
-        rank <- x[i-1] #The last known rank
+        i <- max(which(!is.na(x)))
+        rank <- x[i] #The last known rank
         x[which(is.na(x))] <- sprintf("%s %s", label, rank)
       } else {
         if (!is.null(other_label)){

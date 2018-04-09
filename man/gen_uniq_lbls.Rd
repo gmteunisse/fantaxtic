@@ -27,5 +27,5 @@ gen_uniq_lbls(lbls, sep_char = "_")
 #Also works with factors or numerics
 gen_uniq_lvls(as.factor(lbls))
 lbls <- as.numeric(c(1, 2, 2, 3, 3, 3, 4))
-gen_uniq_lvls(lbls)
+gen_uniq_lbls(lbls)
 }
