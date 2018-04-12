@@ -10,9 +10,11 @@
 #' collapsed taxa).
 #'
 #' By default, unique labels per taxon will be generated in the case that
-#' multiple taxa with identical labels exist. Moreover, \code{NA} values in the
-#' \code{tax_table} of the phyloseq object will be renamed to \code{"Unknown"}
-#' to avoid confusion.
+#' multiple taxa with identical labels exist, unless the user chooses to suppress
+#' this. Moreover, \code{NA} values in the \code{tax_table} of the phyloseq
+#' object will be renamed to \code{"Unknown"} to avoid confusion. WARNING:
+#' duplicate labels in the data lead to incorrect displaying of data and
+#' labels.
 #'
 #' To facilitate visualisation and/or interpretation, samples can be reordered
 #' according alphabetically, by the abundance of a certain taxon, by
@@ -84,7 +86,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   }
 
   #Extract tax_tbl and add OTU names
-  tax_tbl <- as.data.frame(tax_table(physeq_obj))
+  tax_tbl <- as.data.frame(phyloseq::tax_table(physeq_obj))
   tax_tbl$otu_name <- row.names(tax_tbl)
 
   #Replace NAs with Unknown
@@ -105,7 +107,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     tax_tbl <- tax_tbl[ordr,]
   }
 
-  #Refactor for legend ordering
+  #Refactor for legend ordering and order
   if (is.null(color_levels)){
     tax_levels <- unique(tax_tbl[[color_by]])
   } else {
@@ -120,10 +122,10 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   tax_tbl <- tax_tbl[order(tax_tbl[[color_by]]),]
 
   #Get the tax and OTU tables
-  otu_tbl <- as.data.frame(otu_table(physeq_obj))
+  otu_tbl <- as.data.frame(phyloseq::otu_table(physeq_obj))
 
   #Check the orientation of the otu_tbl and change if required
-  if (!taxa_are_rows(otu_table(physeq_obj))){
+  if (!taxa_are_rows(phyloseq::otu_table(physeq_obj))){
     otu_tbl <- as.data.frame(t(otu_tbl))
   }
 
@@ -177,29 +179,29 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   #Join labels and counts and transform to a long data format
   counts <- cbind(tax_tbl[[color_by]], tax_tbl[[label_by]], otu_tbl)
   names(counts) <- c("color_by", "label_by", colnames(otu_tbl))
-  counts_long <- melt(counts,
+  counts_long <- reshape2::melt(counts,
                       id.vars = c("color_by", "label_by"),
                       variable.name = "Sample",
                       value.name = "Abundance")
 
   #Add facet levels if needed and transform to a long data format
   if (!is.null(facet_by)){
-    facet <- as.data.frame(sample_data(physeq_obj))[[facet_by]]
-    names(facet) <- row.names(sample_data(physeq_obj))
+    facet <- as.data.frame(phyloseq::sample_data(physeq_obj))[[facet_by]]
+    names(facet) <- row.names(phyloseq::sample_data(physeq_obj))
     ord <- match(counts_long$Sample, names(facet))
     facet <- facet[ord]
     counts_long$facet <- facet
   }
   if (!is.null(grid_by)){
-    grid <- as.data.frame(sample_data(physeq_obj))[[grid_by]]
-    names(grid) <- row.names(sample_data(physeq_obj))
+    grid <- as.data.frame(phyloseq::sample_data(physeq_obj))[[grid_by]]
+    names(grid) <- row.names(phyloseq::sample_data(physeq_obj))
     ord <- match(counts_long$Sample, names(grid))
     grid <- grid[ord]
     counts_long$grid <- grid
   }
 
   #Generate a plot
-  p <- ggplot(counts_long, aes(x = Sample, y = Abundance, fill = label_by)) +
+  p <- ggplot2::ggplot(counts_long, aes(x = Sample, y = Abundance, fill = label_by)) +
     geom_bar(position = "stack", stat = "identity") +
     guides(fill=guide_legend(title = label_by, ncol = 1)) +
     scale_fill_manual(values = clr_pal) +

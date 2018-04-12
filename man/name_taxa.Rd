@@ -5,20 +5,24 @@
 \title{Add names for missing taxon names in phyloseq objects}
 \usage{
 name_taxa(physeq_obj, label = "Unknown", other_label = NULL,
-  species = FALSE)
+  species = FALSE, unique_rank = NULL, unique_sep = " ")
 }
 \arguments{
 \item{physeq_obj}{A phyloseq object with a \code{tax_table}.}
 
 \item{other_label}{The label(s) of samples whose names should not be altered.}
 
-\item{species}{Generate a Genus species label for the species level?}
+\item{species}{Generate a 'Genus species' (i.e. 'Escherichia Coli') label
+for the species level?}
+
+\item{unique_rank}{The taxonomic rank by which to generate unique labels
+(added number) if desired (default = \code{"Unknown"}).}
+
+\item{unique_sep}{The text character(s) by which to separate the annotation
+and the unique number (only when \code{!is.null(unique_rank)}).}
 
 \item{unknown_label}{Label to prepend the taxon name with (default =
 \code{"Unknown"}).}
-}
-\value{
-A phyloseq object
 }
 \description{
 This function adds names for OTUs/ASVs with incomplete taxonomic

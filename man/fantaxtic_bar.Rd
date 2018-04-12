@@ -62,9 +62,11 @@ be specified as "other" that receive a specific color (e.g. outliers,
 collapsed taxa).
 
 By default, unique labels per taxon will be generated in the case that
-multiple taxa with identical labels exist. Moreover, \code{NA} values in the
-\code{tax_table} of the phyloseq object will be renamed to \code{"Unknown"}
-to avoid confusion.
+multiple taxa with identical labels exist, unless the user chooses to suppress
+this. Moreover, \code{NA} values in the \code{tax_table} of the phyloseq
+object will be renamed to \code{"Unknown"} to avoid confusion. WARNING:
+duplicate labels in the data lead to incorrect displaying of data and
+labels.
 
 To facilitate visualisation and/or interpretation, samples can be reordered
 according alphabetically, by the abundance of a certain taxon, by
