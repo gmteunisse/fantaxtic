@@ -15,11 +15,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.4.4), 
     stats, 
-    grDevices,
-    ggplot2 (>= 2.2.1),
-    phyloseq (>= 1.22.3),
-    reshape2 (>= 1.4.3)
-Imports:
+    grDevices
     ggplot2 (>= 2.2.1),
     phyloseq (>= 1.22.3),
     reshape2 (>= 1.4.3)
