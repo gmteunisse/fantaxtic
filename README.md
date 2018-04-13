@@ -9,7 +9,7 @@ Keywords: _taxonomy, phyloseq, relative, abundance, bar, ggplot2, R_
 In the R console, type:
 ```
 #install.packages(devtools)
-library(devtools)
+install.packages(devtools)
 devtools::install_github("gmteunisse/Fantaxtic")
 ```
 
