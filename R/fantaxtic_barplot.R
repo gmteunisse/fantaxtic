@@ -35,9 +35,10 @@
 #' @param gen_uniq_lbls Generate unique labels (default = \code{TRUE})?
 #' @param other_label A character vector specifying the names of taxa in
 #' \code{label_by} to use a specific color for.
-#' @param order_alg The algorithm by which to order samples. One of \code{hclust}
-#' (hierarhical clustering; default), \code{as.is} (current order), \code{alph}
-#' (alphabetical) or \code{other.abnd} (abundance of the sum of "other" taxa).
+#' @param order_alg The algorithm by which to order samples, or one or more taxa
+#' found in \code(label_by). Algorithms can be one of \code{hclust}
+#' (hierarhical clustering; default), \code{as.is} (current order) or \code{alph}
+#' (alphabetical).
 #' @param color_levels Character vector containing names of levels. Useful to
 #' enforce identical colors for levels across different plots or to pair levels
 #' with colors.
