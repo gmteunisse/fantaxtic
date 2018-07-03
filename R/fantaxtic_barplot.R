@@ -164,19 +164,37 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   otu_tbl <- otu_tbl[ord,]
 
   #Order the samples according to the specified algorithm
-  if (order_alg == "alphabetical"){
-    otu_tbl <- otu_tbl[,order(names(otu_tbl))]
-  }
-  if(order_alg == "hclust"){
-    hc <- hclust(dist(x = t(otu_tbl), method = "euclidian", upper = F))
-    smpl_ord <- hc$order
+  #Order according to selected taxonomies
+  print(tax_tbl[[label_by]])
+  if (sum(order_alg %in% c("alph", "hclust", "as.is")) == 0){
+    sums <- list()
+    i <- 0
+    for (lvl in order_alg){
+      i <- i + 1
+      sums[[i]] <- round(colSums(otu_tbl[which(tax_tbl[[label_by]] == lvl),]), digits = 3)
+    }
+    print(sums)
+    cmd <- paste(sprintf("sums[[%d]]", 1:i), collapse = ", ")
+    smpl_ord <- eval(parse(text = sprintf("order(%s)", cmd)))
     otu_tbl <- otu_tbl[,smpl_ord]
+
+  #Order according to selected algorithm
+  }else{
+    if (order_alg == "alph"){
+      otu_tbl <- otu_tbl[,order(names(otu_tbl))]
+    } else {
+      if(order_alg == "hclust"){
+        hc <- hclust(dist(x = t(otu_tbl), method = "euclidian", upper = F))
+        smpl_ord <- hc$order
+        otu_tbl <- otu_tbl[,smpl_ord]
+      } else {
+        if (order_alg == "as.is"){
+          #do nothing
+        }
+      }
+    }
   }
-  if (order_alg == "other.abnd"){
-    other_sum <- colSums(otu_tbl[which(tax_tbl[[label_by]] %in% other_label),])
-    smpl_ord <- order(other_sum)
-    otu_tbl <- otu_tbl[,smpl_ord]
-  }
+
 
   #Join labels and counts and transform to a long data format
   counts <- cbind(tax_tbl[[color_by]], tax_tbl[[label_by]], otu_tbl)
