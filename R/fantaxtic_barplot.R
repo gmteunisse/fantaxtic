@@ -46,6 +46,8 @@
 #' taxa.
 #' @param palette A user specified palette to color the bars with. Replaces
 #' \code{base_color}.
+#' @param bar_width The width of the bars as a fraction of the binwidth
+#' (default = 0.9).
 #' @return A \code{ggplot2} object.
 #' @examples
 #' #Load data
@@ -76,7 +78,7 @@
 #'               facet_by = "SampleType", other_label = "Other")
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
-                          grid_by = NULL, facet_type = "wrap",
+                          grid_by = NULL, facet_type = "wrap", bar_width = 0.9,
                           facet_cols =  1, gen_uniq_lbls = TRUE, other_label= NULL,
                           order_alg = "hclust", color_levels = NULL,
                           base_color = "#6495ed",
@@ -165,15 +167,17 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
 
   #Order the samples according to the specified algorithm
   #Order according to selected taxonomies
-  print(tax_tbl[[label_by]])
   if (sum(order_alg %in% c("alph", "hclust", "as.is")) == 0){
+
+    #Get the summed abundances
     sums <- list()
     i <- 0
     for (lvl in order_alg){
       i <- i + 1
       sums[[i]] <- round(colSums(otu_tbl[which(tax_tbl[[label_by]] == lvl),]), digits = 3)
     }
-    print(sums)
+
+    #Sort
     cmd <- paste(sprintf("sums[[%d]]", 1:i), collapse = ", ")
     smpl_ord <- eval(parse(text = sprintf("order(%s)", cmd)))
     otu_tbl <- otu_tbl[,smpl_ord]
@@ -226,7 +230,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
 
   #Generate a plot
   p <- ggplot2::ggplot(counts_long, aes(x = Sample, y = Abundance, fill = label_by)) +
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::geom_bar(position = "stack", stat = "identity", width = bar_width) +
     ggplot2::guides(fill=guide_legend(title = label_by, ncol = 1)) +
     ggplot2::scale_fill_manual(values = clr_pal) +
     ggplot2::scale_y_continuous(expand = c(0,0)) +
