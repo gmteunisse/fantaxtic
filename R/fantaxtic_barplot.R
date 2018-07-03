@@ -29,6 +29,8 @@
 #' facet the plots.
 #' @param grid_by The name of a second factor in the \code{sample_data} by which to
 #' facet to plots, resulting in a grid.
+#' @param facet_type The type of faceting from ggplot2 to use, either \code{grid}
+#' or \code(wrap) (default).
 #' @param facet_cols The number of columns to use for faceting.
 #' @param gen_uniq_lbls Generate unique labels (default = \code{TRUE})?
 #' @param other_label A character vector specifying the names of taxa in
@@ -74,7 +76,7 @@
 #'               facet_by = "SampleType", other_label = "Other")
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
-                          grid_by = NULL,
+                          grid_by = NULL, facet_type = "wrap",
                           facet_cols =  1, gen_uniq_lbls = TRUE, other_label= NULL,
                           order_alg = "hclust", color_levels = NULL,
                           base_color = "#6495ed",
@@ -185,6 +187,10 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
                       value.name = "Abundance")
 
   #Add facet levels if needed and transform to a long data format
+  if(is.null(facet_by) & !is.null(grid_by)){
+    facet_by <- grid_by
+    grid_by <- NULL
+  }
   if (!is.null(facet_by)){
     facet <- as.data.frame(phyloseq::sample_data(physeq_obj))[[facet_by]]
     names(facet) <- row.names(phyloseq::sample_data(physeq_obj))
@@ -202,14 +208,14 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
 
   #Generate a plot
   p <- ggplot2::ggplot(counts_long, aes(x = Sample, y = Abundance, fill = label_by)) +
-    geom_bar(position = "stack", stat = "identity") +
-    guides(fill=guide_legend(title = label_by, ncol = 1)) +
-    scale_fill_manual(values = clr_pal) +
-    scale_y_continuous(expand = c(0,0)) +
-    theme(axis.line.x = element_line(colour = 'grey'),
+    ggplot2::geom_bar(position = "stack", stat = "identity") +
+    ggplot2::guides(fill=guide_legend(title = label_by, ncol = 1)) +
+    ggplot2::scale_fill_manual(values = clr_pal) +
+    ggplot2::scale_y_continuous(expand = c(0,0)) +
+    ggplot2::theme(axis.line.x = element_line(colour = 'grey'),
           axis.line.y = element_line(colour = 'grey'),
           axis.ticks = element_line(colour = 'grey'),
-          axis.text.x = element_text(angle=90, family = "Helvetica",
+          axis.text.x = element_text(angle = 90, family = "Helvetica",
                                      size = 6, hjust = 1, vjust = 0.5),
           legend.background = element_rect(fill = 'transparent', colour = NA),
           legend.key = element_rect(fill = "transparent"),
@@ -225,10 +231,20 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
           text = element_text(family = "Helvetica", size = 8))
 
   if (!is.null(facet_by)) {
-    if(is.null(grid_by)){
-      p <- p + facet_wrap(~facet, scales = "free", ncol = facet_cols)
+    if (facet_type == "wrap"){
+      if (is.null(grid_by)){
+        p <- p + ggplot2::facet_wrap(~facet, scales = "free", ncol = facet_cols)
+      }else{
+        p <- p + ggplot2::facet_wrap(~grid + facet, scales = "free", ncol = facet_cols)
+      }
     }else{
-      p <- p + facet_wrap(~grid + facet, scales = "free", ncol = facet_cols)
+      if (facet_type == "grid"){
+        if (is.null(grid_by)){
+          p <- p + ggplot2::facet_grid(~facet, scales = "free", space = "free")
+        }else{
+          p <- p + ggplot2::facet_grid(facet ~ grid, scales = "free", space = "free")
+        }
+      }
     }
   }
 
