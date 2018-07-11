@@ -8,13 +8,13 @@
 #' species if desired.
 #'
 #' @param physeq_obj A phyloseq object with a \code{tax_table}.
-#' @param unknown_label Label to prepend the taxon name with (default =
+#' @param label Label to prepend the taxon name with (default =
 #' \code{"Unknown"}).
 #' @param other_label The label(s) of samples whose names should not be altered.
 #' @param species Generate a 'Genus species' (i.e. 'Escherichia Coli') label
 #' for the species level?
 #' @param unique_rank The taxonomic rank by which to generate unique labels
-#' (added number) if desired (default = \code{"Unknown"}).
+#' (added number) if desired (default = \code{"Unannotated"}).
 #' @param unique_sep The text character(s) by which to separate the annotation
 #' and the unique number (only when \code{!is.null(unique_rank)}).
 #' @examples
@@ -22,7 +22,7 @@
 #' name_na_taxa(GlobalPatterns)
 #' name_na_taxa(GlobalPatterns, unknown_label = "Unannotated")
 #' @export
-name_taxa <- function(physeq_obj, label = "Unknown", other_label = NULL, species = FALSE, unique_rank = NULL, unique_sep = " "){
+name_taxa <- function(physeq_obj, label = "Unannotated", other_label = NULL, species = FALSE, unique_rank = NULL, unique_sep = " "){
 
   #Get the tax table
   tax_tbl <- phyloseq::tax_table(physeq_obj)
@@ -35,12 +35,12 @@ name_taxa <- function(physeq_obj, label = "Unknown", other_label = NULL, species
   tax_tbl <- t(apply(tax_tbl, 1, function(x){
     n <- length(x)
     if (sum(is.na(x)) == n){
-      tax_ranks <- rep(label, n)
+      tax_ranks <- rep("Unknown", n)
     } else {
       if (sum(is.na(x)) != 0){
         i <- max(which(!is.na(x)))
         rank <- x[i] #The last known rank
-        x[which(is.na(x))] <- sprintf("%s %s", label, rank)
+        x[which(is.na(x))] <- sprintf("%s %s (%s)", label, rank, names(x)[i])
       } else {
         if (!is.null(other_label)){
           if (sum(other_label %in%  x) > 0){
