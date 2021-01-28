@@ -29,19 +29,36 @@ In the R console, type:
 library(fantaxtic)
 ```
 
-# An example
-As an example, you can create a barplot using the GlobalPatterns data from the Phyloseq package.
-```
-#Load data
+# Example: Barplot of relative OTU/ASV abundances
+First load the data.
+```{r, include = T, fig.align = "center", fig.width = 8}
+library(fantaxtic)
 data(GlobalPatterns)
+```
 
-#Get the 10 most abundant OTUs / ASVs
+Now subset the data to the 10 most abundants OTUs or ASVs using the `get_top_taxa` function. All other OTUs/ASVs will be collapsed into `"Other"` 
+```{r, include = T, fig.align = "center", fig.width = 8}
 ps_tmp <- get_top_taxa(physeq_obj = GlobalPatterns, n = 10, relative = TRUE,
                        discard_other = FALSE, other_label = "Other")
+```
 
-#Create labels for missing taxonomic ranks
+Next, create labels for missing taxonomic ranks using the `name_taxa` function.
+```{r, include = T, fig.align = "center", fig.width = 8}
 ps_tmp <- name_taxa(ps_tmp, label = "Unkown", species = T, other_label = "Other")
+```
 
-#Generate a barplot that is colored by Phylum and labeled by Species, coloring
-#collapsed taxa grey.
+You are now ready to generate a `fantaxtix_bar`! Generate a plot that is colored by Phylum and labeled by Species, coloring the collapsed taxa grey.
+The output is a translation table of phylum to color, and a `ggplot2` plot.
+```{r, include = T, fig.align = "center", fig.width = 8}
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
+```
+
+Perhaps a different sample ordering is more meaningful. Let's order the samples by the abundance of the collapsed category, labeled as "Other".
+```{r, include = T, fig.align = "center", fig.width = 8}
+fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
+               order_alg = "other.abnd")
+```
+
+Does the story change when we facet the plot by sample type? Add a faceting factor.
+```{r, include = T, fig.align = "center", fig.width = 8, fig.height = 10}
+fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", facet_by = "SampleType", other_label = "Other")
