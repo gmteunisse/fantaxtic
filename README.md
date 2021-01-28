@@ -6,9 +6,20 @@ For now the package contains a sole plotting function, `fantaxtic_bar`, and some
 Keywords: _taxonomy, phyloseq, relative, abundance, bar, ggplot2, R_
 
 # Installation
-In the R console, type:
+Make sure that `phyloseq` is installed:
+
 ```
-#install.packages(devtools)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("phyloseq")
+```
+Now install `Fantaxtic` with `devtools`:
+```
+if(!"devtools" %in% installed.packages()){
+  install.packages("devtools", dependencies = T, )
+}
+
 devtools::install_github("gmteunisse/Fantaxtic")
 ```
 
