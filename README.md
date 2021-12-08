@@ -5,6 +5,8 @@ For now the package contains a sole plotting function, `fantaxtic_bar`, and some
 
 Keywords: _taxonomy, phyloseq, relative, abundance, bar, ggplot2, R_
 
+**NOTE: Fantaxtic is no longer being actively maintained**
+
 # Installation
 Make sure that `phyloseq` is installed:
 
