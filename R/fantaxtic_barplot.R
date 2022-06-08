@@ -50,6 +50,7 @@
 #' @param bar_width The width of the bars as a fraction of the binwidth
 #' (default = 0.9).
 #' @return A \code{ggplot2} object.
+#' @import ggplot2, phyloseq, reshape2
 #' @examples
 #' #Load data
 #' data(GlobalPatterns)
@@ -142,7 +143,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
   }
 
   #Generate the required color palette
-  clr_pal <- gen_palette(clr_tbl = clr_tbl, clr_pal = palette, base_clr = base_color)
+  clr_pal <- gen_palette(clr_tbl = clr_tbl, clr_pal = palette, base_clr = base_color)$palette
   names(clr_pal) <- clr_tbl$Var1
   clr_pal <- as.vector(unlist(clr_pal))
   if(!is.null(other_label)){

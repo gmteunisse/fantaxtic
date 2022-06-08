@@ -55,10 +55,10 @@ gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
     warning("Warning: generating > 7 shades and tints; results may be hard to read.")
   }
 
-  #Print the translation table from color.by to their central colors
+  #Create the translation table from color.by to their central colors
   clr_mtrx <- cbind(clr_tbl, clr_pal)
   names(clr_mtrx) <- c("Level", "N.color.shades", "Central.color")
-  print(clr_mtrx)
+  clr_mat <- clr_mtrx
 
   #Generate i vars for each clr in  clr.pal
   clr_mtrx <- cbind(clr_vars, clr_pal)
@@ -68,5 +68,6 @@ gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
     clr <- v[2]
     gen_shades_tints(i, clr)
   })
-  return(palette)
+  return(list(palette = palette,
+              colours = clr_mat))
 }
