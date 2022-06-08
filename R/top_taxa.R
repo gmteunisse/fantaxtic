@@ -7,8 +7,8 @@
 #' The top taxa can be identified based on the absolute abundances or proportions.
 #'
 #' @details
-#' This function, together with \link[fantaxtic]{collapse_taxa} replaces
-#' \link[fantaxtic]{get_top_taxa}. Identical output can be obtained  by setting
+#' This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
+#' \code{\link[fantaxtic]{get_top_taxa}}. Identical output can be obtained  by setting
 #' \code{FUN = sum}.
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
@@ -23,7 +23,7 @@
 #' @param ... Additional arguments to be passed to \code{FUN}.
 #' @return A tibble with the rank, taxon id, grouping factors, abundance summary
 #' statistic and taxonomy.
-#' @import phyloseq, dplyr, magrittr
+#' @import phyloseq dplyr magrittr
 #' @examples
 #' data(GlobalPatterns)
 #'
@@ -126,7 +126,7 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 #'
 #' This function, together with \link[fantaxtic]{top_taxa} replaces
 #' \link[fantaxtic]{get_top_taxa}. Identical output can be obtained by setting
-#' \code{FUN = sum} in \link[fantaxtic]{top_taxa.
+#' \code{FUN = sum} in \link[fantaxtic]{top_taxa}.
 #'
 #' @param ps_obj Phyloseq object
 #' @param taxa_to_keep taxon ids (taxids) to be kept. These taxon ids need to
