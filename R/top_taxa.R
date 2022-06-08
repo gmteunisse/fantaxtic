@@ -9,7 +9,7 @@
 #' @details
 #' This function, together with \link[fantaxtic]{collapse_taxa} replaces
 #' \link[fantaxtic]{get_top_taxa}. Identical output can be obtained  by setting
-#' \code{FUN = sum}. This has now been replaced
+#' \code{FUN = sum}.
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
@@ -115,9 +115,47 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
   return(top)
 }
 
-# This function merges all taxa that are not specified in 'taxa' into  a taxon
-# named 'other_label' if 'discard_other = FALSE', else it removes them.
-collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, other_label = "Other"){
+#' Subset a phyloseq object
+#'
+#' This function takes a phyloseq object and a list of taxon ids to be kept,
+#' and discards or merges all other taxa.
+#'
+#' @details
+#' This function is essentially a wrapper around \link[phyloseq]{prune_taxa} and
+#' \link[phyloseq]{merge_taxa}.
+#'
+#' This function, together with \link[fantaxtic]{top_taxa} replaces
+#' \link[fantaxtic]{get_top_taxa}. Identical output can be obtained by setting
+#' \code{FUN = sum} in \link[fantaxtic]{top_taxa.
+#'
+#' @param ps_obj Phyloseq object
+#' @param taxa_to_keep taxon ids (taxids) to be kept. These taxon ids need to
+#' be part of \code{taxa_names(ps_obj)}
+#' @param discard_other if \code{TRUE}, any taxon not in \code{taxa_to_keep} is
+#' discard. If \code{FALSE}, they are collapsed into a single taxon labeled
+#' \code{other_label}
+#' @param merged_label Label for the new merged taxon
+#' @return A phyloseq object
+#' @import phyloseq
+#' @examples
+#' data(GlobalPatterns)
+#'
+#' # Top 10 most abundant ASVs over all samples, collapse other ASVs into 'Other'
+#' top <- top_taxa(GlobalPatterns, 10)
+#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid)
+#'
+#' # Top 10 most abundant ASVs over all samples, discard other taxa
+#' top <- top_taxa(GlobalPatterns, 10)
+#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid,
+#'                               discard_other = TRUE)
+#'
+#' # Top 10 most abundant ASVs over all samples, collapse other ASVs into 'Low abundance'
+#' top <- top_taxa(GlobalPatterns, 10)
+#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid,
+#'                               collapsed_label = "Low abundance")
+#'
+#' @export
+collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, merged_label = "Other"){
 
   # Make sure taxa are rows
   if (!phyloseq::taxa_are_rows(ps_obj)) {
@@ -134,10 +172,10 @@ collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, other_lab
     to_merge <- to_merge[!(to_merge %in% taxa_to_keep)]
     ps_obj <- merge_taxa(ps_obj, to_merge)
 
-    # Update the taxon name to other_label
+    # Update the taxon name to merged_label
     tax_tbl <- phyloseq::tax_table(ps_obj)
     indx <- which(row.names(tax_tbl) %in% to_merge)
-    tax_tbl[indx, ] <- other_label
+    tax_tbl[indx, ] <- merged_label
     phyloseq::tax_table(ps_obj) <- tax_tbl
   }
   return(ps_obj)
