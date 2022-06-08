@@ -2,7 +2,7 @@
 #'
 #' This function identifies the top \eqn{n} taxa in a phyloseq object. Users specify the
 #' summary statistic that is used to rank the taxa, e.g. \code{sum}, \code{mean} or
-#' \code{median}. whether Furthermore, it is possible to add one or more grouping
+#' \code{median}. Furthermore, it is possible to add one or more grouping
 #' factors from the \code{tax_table} to get group-specific top \eqn{n} taxa.
 #' The top taxa can be identified based on the absolute abundances or proportions.
 #'
