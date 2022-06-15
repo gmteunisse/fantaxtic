@@ -47,14 +47,6 @@ gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
     clr_pal <- clr_pal[1:n_clrs]
   }
 
-  #Give warnings when many colors are present
-  if (n_clrs > 10){
-    warning("Warning: using > 10 base colors, results may be hard to read")
-  }
-  if (max(clr_vars) > 7){
-    warning("Warning: generating > 7 shades and tints; results may be hard to read.")
-  }
-
   #Create the translation table from color.by to their central colors
   clr_mtrx <- cbind(clr_tbl, clr_pal)
   names(clr_mtrx) <- c("Level", "N.color.shades", "Central.color")
@@ -70,4 +62,69 @@ gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
   })
   return(list(palette = palette,
               colours = clr_mat))
+}
+
+#' @import dplyr tidyr purrr
+#' @export
+nested_colours <- function(df, group, subgroup, palette = NULL, base_clr = "#6495ed"){
+
+  #Define a base palette
+  base_pal <- c("#6495ed", "#ff7256", "#edbc64", "#8470ff", "#8ee5ee", "#EE8DD6")
+
+  #Define the number of variants required per color
+  groups <- df %>%
+    pull(!!group) %>%
+    unique()
+  n_clrs <- groups %>%
+    length()
+
+  #Check arguments and generate colors if required
+  if (is.null(palette)){
+    if (base_clr != "#6495ed"){
+      clr_pal <- gen_colors(n_clrs, base_clr)
+    } else {
+      if (n_clrs <= length(base_pal)){
+        clr_pal <- base_pal[1:n_clrs]
+      } else {
+        clr_pal <- gen_colors(n_clrs, base_clr)
+      }
+    }
+  } else {
+    if (length(palette) < n_clrs){
+      stop(sprintf("Error: %d values required in clr.pal, %d provided.", n_clrs, length(palette)))
+    }
+    clr_pal <- palette[1:n_clrs]
+  }
+
+  # Assign group colours
+  if (!is.null(names(clr_pal))){
+    if (all(groups %in% names(clr_pal))){
+      group_colours <- data.frame(group = names(clr_pal),
+                                  group_colour = clr_pal)
+    } else {
+      stop("Error: palette names don't correspond to group levels.")
+    }
+  } else {
+    group_colours <- data.frame(group = groups,
+                                group_colour = clr_pal)
+  }
+
+  # Rename to group name
+  group_colours <- group_colours %>%
+    rename(!!group := "group")
+
+  # Assign subgroup colours
+  clr_tbl <- df %>%
+    select(!!group, !!subgroup) %>%
+    group_by(across(all_of(!!group))) %>%
+    unique() %>%
+    mutate(n = n()) %>%
+    left_join(group_colours, by = group) %>%
+    nest() %>%
+    mutate(subgroup_colours = map(data, ~gen_shades_tints(.x[["n"]][1], .x[["group_colour"]][1]))) %>%
+    unnest(c(data, subgroup_colours)) %>%
+    ungroup()
+
+  return(clr_tbl)
+
 }
