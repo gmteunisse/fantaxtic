@@ -418,8 +418,7 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
     ggplot2::theme(axis.line.x = element_line(colour = 'grey'),
                    axis.line.y = element_line(colour = 'grey'),
                    axis.ticks = element_line(colour = 'grey'),
-                   axis.text.x = element_text(angle = 90, family = "Helvetica",
-                                              size = 6, hjust = 1, vjust = 0.5),
+                   axis.text.x = element_text(angle = 90, size = 6, hjust = 1, vjust = 0.5),
                    legend.background = element_rect(fill = 'transparent', colour = NA),
                    legend.key = element_rect(fill = "transparent"),
                    legend.key.size = unit(0.4, "cm"),
@@ -430,8 +429,8 @@ fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL
                    plot.background = element_rect(fill = 'transparent', colour = NA),
                    plot.title = element_text(hjust = 0.5),
                    strip.background = element_blank(),
-                   strip.text = element_text(family = "Helvetica", size = 8, face = "bold"),
-                   text = element_text(family = "Helvetica", size = 8))
+                   strip.text = element_text(size = 8, face = "bold"),
+                   text = element_text(size = 8))
 
   if (!is.null(facet_by)) {
     if (facet_type == "wrap"){
