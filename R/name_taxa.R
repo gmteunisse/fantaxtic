@@ -5,7 +5,8 @@
 #' taxonomic rank. It replaces \code{NA} values with the lowest
 #' available taxonomic annotation for an OTU/ASV and a label indicating
 #' that the annotation is unknown. Species can be renamed to genus +
-#' species if desired.
+#' species if desired. To avoid downstream problem, it numbers
+#' taxa with the same taxonomic annotation but different sequences.
 #'
 #' @param physeq_obj A phyloseq object with a \code{tax_table}.
 #' @param label Label to prepend the taxon name with (default =

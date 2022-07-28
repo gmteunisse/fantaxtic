@@ -16,14 +16,18 @@ LazyData: true
 Depends: R (>= 3.4.4), 
     stats, 
     grDevices,
-    ggplot2 (>= 2.2.1),
-    phyloseq (>= 1.22.3),
-    reshape2 (>= 1.4.3)
+    ggplot2,
+    phyloseq,
+    reshape2,
+    dplyr,
+    magrittr
 Imports:
-    ggplot2 (>= 2.2.1),
-    phyloseq (>= 1.22.3),
-    reshape2 (>= 1.4.3)
-RoxygenNote: 6.0.1
+    ggplot2,
+    phyloseq,
+    reshape2,
+    dplyr,
+    magrittr
+RoxygenNote: 7.2.0
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

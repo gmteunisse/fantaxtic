@@ -4,11 +4,20 @@
 \alias{name_taxa}
 \title{Add names for missing taxon names in phyloseq objects}
 \usage{
-name_taxa(physeq_obj, label = "Unknown", other_label = NULL,
-  species = FALSE, unique_rank = NULL, unique_sep = " ")
+name_taxa(
+  physeq_obj,
+  label = "Unannotated",
+  other_label = NULL,
+  species = FALSE,
+  unique_rank = NULL,
+  unique_sep = " "
+)
 }
 \arguments{
 \item{physeq_obj}{A phyloseq object with a \code{tax_table}.}
+
+\item{label}{Label to prepend the taxon name with (default =
+\code{"Unknown"}).}
 
 \item{other_label}{The label(s) of samples whose names should not be altered.}
 
@@ -16,13 +25,10 @@ name_taxa(physeq_obj, label = "Unknown", other_label = NULL,
 for the species level?}
 
 \item{unique_rank}{The taxonomic rank by which to generate unique labels
-(added number) if desired (default = \code{"Unknown"}).}
+(added number) if desired (default = \code{"Unannotated"}).}
 
 \item{unique_sep}{The text character(s) by which to separate the annotation
 and the unique number (only when \code{!is.null(unique_rank)}).}
-
-\item{unknown_label}{Label to prepend the taxon name with (default =
-\code{"Unknown"}).}
 }
 \description{
 This function adds names for OTUs/ASVs with incomplete taxonomic
@@ -30,7 +36,8 @@ annotations, i.e. annotation is only available up to a certain
 taxonomic rank. It replaces \code{NA} values with the lowest
 available taxonomic annotation for an OTU/ASV and a label indicating
 that the annotation is unknown. Species can be renamed to genus +
-species if desired.
+species if desired. To avoid downstream problem, it numbers
+taxa with the same taxonomic annotation but different sequences.
 }
 \examples{
 data(GlobalPatterns)

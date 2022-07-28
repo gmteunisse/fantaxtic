@@ -19,7 +19,7 @@
 #' @param by_proportion Converts absolute abundances to proportions before
 #' calculating the summary statistic (default = \code{TRUE}).
 #' @param FUN Function that returns a single summary statistic from an input vector,
-#' e.g. \code{sum}, \code{mean} or \code{median} (default: \code{mean})
+#' e.g. \code{sum}, \code{mean} (default) or \code{median}
 #' @param ... Additional arguments to be passed to \code{FUN}.
 #' @return A tibble with the rank, taxon id, grouping factors, abundance summary
 #' statistic and taxonomy.
@@ -54,22 +54,30 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
     otu_table(ps_obj) <- phyloseq::otu_table(t(otu_table(ps_obj)), taxa_are_rows = T)
   }
 
-  #Check for empty samples
-  smpl_sms <- phyloseq::sample_sums(ps_obj)
-  if (0 %in% smpl_sms){
-    msg <- sprintf("Warning: some samples contain 0 reads. The following samples have been removed from the analysis:\n%s",
-                   paste(names(smpl_sms)[smpl_sms == 0], collapse = "\n"))
-    warning(msg)
-    ps_obj <- phyloseq::subset_samples(ps_obj, smpl_sms > 0)
+  # Objects with a single taxon cause errors
+  if (ntaxa(ps_obj) > 1){
+    #Check for empty samples
+    smpl_sms <- phyloseq::sample_sums(ps_obj)
+    if (0 %in% smpl_sms){
+      msg <- sprintf("Warning: some samples contain 0 reads. The following samples have been removed from the analysis:\n%s",
+                     paste(names(smpl_sms)[smpl_sms == 0], collapse = "\n"))
+      warning(msg)
+      ps_obj <- phyloseq::subset_samples(ps_obj, smpl_sms > 0)
+    }
+
+    #Use relative abundances if requested
+    if (by_proportion){
+      otu_tab <- apply(otu_table(ps_obj), 2, function(x){
+        x / sum (x)
+      })
+      phyloseq::otu_table(ps_obj) <- phyloseq::otu_table(otu_tab, taxa_are_rows = T)
+    }
+  } else {
+    if (by_proportion){
+      phyloseq::otu_table(ps_obj)[1,] <- 1
+    }
   }
 
-  #Use relative abundances if requested
-  if (by_proportion){
-    otu_tab <- apply(otu_table(ps_obj), 2, function(x){
-      x / sum (x)
-    })
-    phyloseq::otu_table(ps_obj) <- phyloseq::otu_table(otu_tab, taxa_are_rows = T)
-  }
 
   # Get the top taxa
   if(!is.null(grouping)){
@@ -81,10 +89,6 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
                      paste(grouping[!group_in_vars], collapse = ", "))
       stop(msg)
     }
-  } else {
-    msg <- sprintf("No group supplied. Obtaining top %d taxa over all samples.",
-                   n_taxa)
-    message(msg)
   }
 
   # Get the top taxa per group
@@ -179,4 +183,96 @@ collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, merged_la
     phyloseq::tax_table(ps_obj) <- tax_tbl
   }
   return(ps_obj)
+}
+
+nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
+                            n_top_taxa = 1, n_nested_taxa = 1,
+                            merged_label = "Other", by_proportion = T,
+                            ...){
+
+  # Check arguments
+  if (is.null(top_tax_level)){
+    stop("Error: no top_tax_level provided")
+  } else if (!top_tax_level %in% rank_names(ps_obj)){
+    msg <- sprintf("Error: top_tax_level %s not in rank_names(ps_obj)", top_tax_level)
+    stop(msg)
+  }
+  if (is.null(nested_tax_level)){
+    stop("Error: no nested_tax_level provided")
+  } else if (!nested_tax_level %in% rank_names(ps_obj)){
+    msg <- sprintf("Error: nested_tax_level %s not in rank_names(ps_obj)", nested_tax_level)
+    stop(msg)
+  }
+
+  # Make sure taxa are rows
+  if (!phyloseq::taxa_are_rows(ps_obj)) {
+    otu_table(ps_obj) <- phyloseq::otu_table(t(otu_table(ps_obj)), taxa_are_rows = T)
+  }
+
+  # Glom taxa
+  ps_obj_nest <- tax_glom(ps_obj, taxrank = nested_tax_level)
+  ps_obj_top <- tax_glom(ps_obj_nest, taxrank = top_tax_level)
+
+  # Get the top n top_tax_level taxa
+  top_top <- top_taxa(ps_obj_top, n_taxa = n_top_taxa, by_proportion = by_proportion, ...)
+
+  # Get the taxids for the nested levels and collapse all other taxa
+  taxa <- tax_table(ps_obj_nest) %>%
+    data.frame(taxid = row.names(.)) %>%
+    filter(!!as.symbol(top_tax_level) %in% top_top[[top_tax_level]])
+  ps_obj_nest <- collapse_taxa(ps_obj_nest, taxa$taxid, merged_label = merged_label)
+
+  # Loop through each top_tax_level and get the top n nested_tax_level taxa
+  lvls <- unique(taxa[,top_tax_level])
+  top_nest <- list()
+  for (lvl in lvls){
+
+    # Get the taxids within the top_lvl
+    taxids <- tax_table(ps_obj_nest) %>%
+      data.frame(taxid = row.names(.)) %>%
+      filter(!!as.symbol(top_tax_level) == lvl) %>%
+      pull(taxid)
+    ps_obj_tmp <- collapse_taxa(ps_obj_nest, taxids, discard_other = T) %>%
+      suppressWarnings()
+
+    # Get the top n nested_tax_level taxa and merge other taxa
+    top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...) %>%
+      suppressWarnings()
+    to_merge <- taxa_names(ps_obj_tmp) %>%
+      .[!. %in% top_nest[[lvl]]$taxid]
+    ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge) %>%
+      suppressWarnings()
+  }
+
+  # Combine data
+  top_nest <- do.call("rbind", top_nest)
+
+  # Add top abundances
+  if (by_proportion){
+    top <- top_top %>%
+      select(where(~!all(is.na(.x)))) %>%
+      select(!c(taxid)) %>%
+      rename(top_abundance = abundance,
+             top_tax_rank = tax_rank) %>%
+      left_join(top_nest, .) %>%
+      rename(nested_abundance = abundance,
+             nested_tax_rank = tax_rank) %>%
+      relocate(taxid, top_abundance, nested_abundance, top_tax_rank, nested_tax_rank) %>%
+      suppressMessages()
+  }
+
+  # Update the taxon name to merged_label
+  tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
+    data.frame() %>%
+    mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
+                                       sprintf("%s %s", merged_label, !!sym(top_tax_level)),
+                                       !!sym(nested_tax_level))
+           ) %>%
+    as.matrix()
+  phyloseq::tax_table(ps_obj_nest) <- tax_tbl
+
+  # Return a list of top and merged values
+  return(list(ps_obj = ps_obj_nest,
+              top_taxa = top))
+
 }
