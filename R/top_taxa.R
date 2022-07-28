@@ -174,13 +174,13 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
   # Check arguments
   if (is.null(top_tax_level)){
     stop("Error: no top_tax_level provided")
-  } else if (!top_tax_level %in% rank_names(ps_obj)){
+  } else if (!top_tax_level %in% c(rank_names(ps_obj), "ASV")){
     msg <- sprintf("Error: top_tax_level %s not in rank_names(ps_obj)", top_tax_level)
     stop(msg)
   }
   if (is.null(nested_tax_level)){
     stop("Error: no nested_tax_level provided")
-  } else if (!nested_tax_level %in% rank_names(ps_obj)){
+  } else if (!nested_tax_level %in% c(rank_names(ps_obj), "ASV")){
     msg <- sprintf("Error: nested_tax_level %s not in rank_names(ps_obj)", nested_tax_level)
     stop(msg)
   }
@@ -191,8 +191,16 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
   }
 
   # Glom taxa
-  ps_obj_nest <- tax_glom(ps_obj, taxrank = nested_tax_level)
-  ps_obj_top <- tax_glom(ps_obj_nest, taxrank = top_tax_level)
+  if (nested_tax_level == "ASV"){
+    ps_obj_nest <- ps_obj
+  } else {
+    ps_obj_nest <- tax_glom(ps_obj, taxrank = nested_tax_level)
+  }
+  if(top_tax_level == "ASV"){
+    ps_obj_top <- ps_obj
+  } else {
+    ps_obj_top <- tax_glom(ps_obj_nest, taxrank = top_tax_level)
+  }
 
   # Get the top n top_tax_level taxa
   top_top <- top_taxa(ps_obj_top, n_taxa = n_top_taxa, by_proportion = by_proportion, ...)
