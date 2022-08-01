@@ -4,12 +4,15 @@
 #' summary statistic that is used to rank the taxa, e.g. \code{sum}, \code{mean} or
 #' \code{median}. Furthermore, it is possible to add one or more grouping
 #' factors from the \code{tax_table} to get group-specific top \eqn{n} taxa.
-#' The top taxa can be identified based on the absolute abundances or proportions.
 #'
 #' @details
 #' This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
 #' \code{\link[fantaxtic]{get_top_taxa}}. Identical output can be obtained  by setting
 #' \code{FUN = sum}.
+#'
+#' The top taxa can be identified based on the absolute abundances or proportions.
+#' When using absolute abundances, please make sure to normalize or rarefy the data
+#' before using this function.
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
@@ -128,19 +131,32 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 
 #' Get the most abundant taxa over two nested levels
 #'
-#' This function identifies the top \eqn{n} taxa and the top \eqn{m} taxa at a
+#' This function identifies the top \eqn{n} named taxa and the top \eqn{m} named taxa at a
 #' nested level in a phyloseq object. Users specify the
 #' summary statistic that is used to rank the taxa, e.g. \code{sum}, \code{mean} or
 #' \code{median}. Furthermore, it is possible to add one or more grouping
 #' factors from the \code{tax_table} to get group-specific top \eqn{n,m} taxa.
-#' The top taxa can be identified based on the absolute abundances or proportions.
 #'
 #' @details
-#' This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
-#' \code{\link[fantaxtic]{get_top_taxa}}.
+#' This function first finds the top \eqn{n} named taxa at the top level, after
+#' which it merges all other top_taxa level into a single taxon with the
+#' \code{merged_label} annotation. Next, loops through each remaining top level taxon,
+#' and identifies the top  \eqn{m} named taxa at the nested level. If
+#' \eqn{\le m} taxa are available, it will only return those taxa. If more are
+#' available, it will merge all non-top-taxa into a single taxon with the
+#' \code{merged_label} annotation, together with its top level annotation.
+#' If no named taxa are available at the nested_level, all taxa will be merged
+#' into a single taxon with \code{merged_label} annotation, together with its
+#' \code{top_level} annotation. Thus, the \code{merged_label} taxon overall and
+#' in each group represents the combination of taxa without an annotation and
+#' taxa with an annotation that were not in the top \eqn{(n,m)} abundant taxa.
 #'
 #' If \code{nested_tax_level = "ASV"}, \code{row.names(tax_table(ps_obj))} will
 #' be added as an ASV column to the tax_table, unless this column already exists.
+#'
+#' The top taxa can be identified based on the absolute abundances or proportions.
+#' When using absolute abundances, please make sure to normalize or rarefy the data
+#' before using this function.
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
@@ -154,7 +170,7 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 #' @param merged_label Prefix that will be added after merging non-top taxa.
 #' @param ... Additional arguments to be passed \code{top_taxa}
 #' (e.g. \code{grouping = <string>, FUN = mean, na.rm = TRUE},).
-#' @return A list in which \code{top_taxa} is  tibble with the rank, taxon id, grouping
+#' @return A list in which \code{top_taxa} is a tibble with the rank, taxon id, grouping
 #' factors, abundance summary statistic and taxonomy of the top taxa and \code{ps_obj}
 #' is the phyloseq object after collapsing all non-top taxa.
 #' @import phyloseq dplyr tidyr
@@ -167,11 +183,19 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 #' nested_top_taxa(GlobalPatterns, top_tax_level = "Order", nested_tax_level
 #' = "Family", n_top_taxa = 3, n_nested_taxa = 3, merged_label = "Other",
 #' FUN = mean, na.rm = T)
-
+#'
+#' #' # Top 3 most abundant genera, top 3 most abundant species over all samples,
+#' # using the mean as the aggregation function
+#' nested_top_taxa(GlobalPatterns, top_tax_level = "Genus", nested_tax_level
+#' = "Species", n_top_taxa = 3, n_nested_taxa = 3, merged_label = "Other",
+#' FUN = mean, na.rm = T)
 #' @export
 nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
                             n_top_taxa = 1, n_nested_taxa = 1,
-                            merged_label = "Other", by_proportion = T,
+                            top_merged_label = "Other",
+                            nested_merged_label = "Other",
+                            include_nested_tax = TRUE,
+                            by_proportion = T,
                             ...){
 
   # Check arguments
@@ -221,7 +245,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     taxa <- tax_table(ps_obj) %>%
       data.frame(taxid = row.names(.)) %>%
       filter(!!as.symbol(top_tax_level) %in% top_top[[top_tax_level]])
-    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = merged_label)
+    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = top_merged_label)
   } else {
 
     # Also check a level above the top level to
@@ -234,7 +258,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
                !!as.symbol(higher_tax_level) %in% tax[length(tax) - 1])
     })
     taxa <- do.call("rbind", taxa)
-    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = merged_label)
+    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = top_merged_label)
   }
 
   # Add an ASV column if working at ASV level
@@ -334,14 +358,24 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
       suppressMessages()
   }
 
-  # Update the taxon name to merged_label
-  tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
-    data.frame() %>%
-    mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
-                                        sprintf("%s %s", merged_label, !!sym(top_tax_level)),
-                                        !!sym(nested_tax_level))
-    ) %>%
-    as.matrix()
+  # Update the taxon name to nested_merged_label
+  if (include_nested_tax){
+    tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
+      data.frame() %>%
+      mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
+                                          paste(nested_merged_label, !!sym(top_tax_level)),
+                                          !!sym(nested_tax_level))
+      ) %>%
+      as.matrix()
+  } else {
+    tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
+      data.frame() %>%
+      mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
+                                          nested_merged_label,
+                                          !!sym(nested_tax_level))
+      ) %>%
+      as.matrix()
+  }
   phyloseq::tax_table(ps_obj_nest) <- tax_tbl
 
   # Return a list of top and merged values
@@ -351,7 +385,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
 }
 
 
-#' Subset a phyloseq object to its top taxa.
+#' Subset a phyloseq object to a set of taxa.
 #'
 #' This function takes a phyloseq object and a list of taxon ids to be kept,
 #' and discards or merges all other taxa.
