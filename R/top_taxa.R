@@ -139,6 +139,9 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 #' This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
 #' \code{\link[fantaxtic]{get_top_taxa}}.
 #'
+#' If \code{nested_tax_level = "ASV"}, \code{row.names(tax_table(ps_obj))} will
+#' be added as an ASV column to the tax_table, unless this column already exists.
+#'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
 #' @param top_tax_level The name of the top taxonomic rank in the phyloseq object
@@ -172,16 +175,29 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
                             ...){
 
   # Check arguments
+  tax_ranks <- c(rank_names(ps_obj))
+  if (nested_tax_level == "ASV" & !"ASV" %in% tax_ranks){
+    tax_ranks <- c(tax_ranks, "ASV")
+  }
   if (is.null(top_tax_level)){
     stop("Error: no top_tax_level provided")
-  } else if (!top_tax_level %in% c(rank_names(ps_obj), "ASV")){
+  } else if (!top_tax_level %in% tax_ranks){
     msg <- sprintf("Error: top_tax_level %s not in rank_names(ps_obj)", top_tax_level)
     stop(msg)
   }
   if (is.null(nested_tax_level)){
     stop("Error: no nested_tax_level provided")
-  } else if (!nested_tax_level %in% c(rank_names(ps_obj), "ASV")){
+  } else if (!nested_tax_level %in% tax_ranks){
     msg <- sprintf("Error: nested_tax_level %s not in rank_names(ps_obj)", nested_tax_level)
+    stop(msg)
+  }
+  if(top_tax_level == nested_tax_level){
+    msg <- sprintf("Error: top_tax_level and nested_tax_level cannot both be %s", top_tax_level)
+    stop(msg)
+  }
+  if(which(tax_ranks == top_tax_level) > which(tax_ranks == nested_tax_level)){
+    msg <- sprintf("Error: top_tax_level needs to be a higher taxonomic rank than nested_tax_level.
+                    Tax ranks in this object are %s", paste(tax_ranks, collapse = ", "))
     stop(msg)
   }
 
@@ -190,46 +206,114 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     otu_table(ps_obj) <- phyloseq::otu_table(t(otu_table(ps_obj)), taxa_are_rows = T)
   }
 
-  # Glom taxa
-  if (nested_tax_level == "ASV"){
-    ps_obj_nest <- ps_obj
-  } else {
-    ps_obj_nest <- tax_glom(ps_obj, taxrank = nested_tax_level)
-  }
-  if(top_tax_level == "ASV"){
-    ps_obj_top <- ps_obj
-  } else {
-    ps_obj_top <- tax_glom(ps_obj_nest, taxrank = top_tax_level)
-  }
+  # Glom taxa at the top level
+  ps_obj_top <- tax_glom(ps_obj, taxrank = top_tax_level)
 
   # Get the top n top_tax_level taxa
   top_top <- top_taxa(ps_obj_top, n_taxa = n_top_taxa, by_proportion = by_proportion, ...)
 
-  # Get the taxids for the nested levels and collapse all other taxa
-  taxa <- tax_table(ps_obj_nest) %>%
-    data.frame(taxid = row.names(.)) %>%
-    filter(!!as.symbol(top_tax_level) %in% top_top[[top_tax_level]])
-  ps_obj_nest <- collapse_taxa(ps_obj_nest, taxa$taxid, merged_label = merged_label)
+  # Extract the taxonomy of to the top_tax_level and collapse all othersS
+  ranks <- tax_ranks[1:which(tax_ranks == top_tax_level)]
+  if (length(ranks) == 1){
+
+    # Check only the top_level to
+    # get the taxids for the nested levels and collapse all other taxa
+    taxa <- tax_table(ps_obj) %>%
+      data.frame(taxid = row.names(.)) %>%
+      filter(!!as.symbol(top_tax_level) %in% top_top[[top_tax_level]])
+    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = merged_label)
+  } else {
+
+    # Also check a level above the top level to
+    # get the taxids for the nested levels and collapse all other taxa
+    higher_tax_level <- ranks[length(ranks) - 1]
+    taxa <- apply(top_top[,ranks], 1, function(tax){
+      tax_table(ps_obj) %>%
+        data.frame(taxid = row.names(.)) %>%
+        filter(!!as.symbol(top_tax_level) %in% tax[length(tax)],
+               !!as.symbol(higher_tax_level) %in% tax[length(tax) - 1])
+    })
+    taxa <- do.call("rbind", taxa)
+    ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = merged_label)
+  }
+
+  # Add an ASV column if working at ASV level
+  if (nested_tax_level == "ASV"){
+    ranks <- rank_names(ps_obj_nest)
+    if(!"ASV" %in% ranks){
+      tax_table(ps_obj_nest) <- cbind(tax_table(ps_obj_nest),
+                                      ASV = row.names(tax_table(ps_obj_nest)))
+    }
+  } else {
+    # If not ASVs, glom at the nested level.
+
+    # Replace nested NAs with a symbol to avoid glomming
+    na_sym <- sprintf("No %s annotation", nested_level)
+    tax_table(ps_obj_nest) <- tax_table(ps_obj_nest) %>%
+      data.frame() %>%
+      mutate(!!nested_tax_level := replace_na(!!sym(nested_tax_level), na_sym)) %>%
+      as.matrix()
+
+    # Glom
+    ps_obj_nest <- tax_glom(ps_obj_nest, taxrank = nested_tax_level)
+
+    # Convert na_sym back to NA
+    tax_table(ps_obj_nest) <- tax_table(ps_obj_nest) %>%
+      data.frame() %>%
+      mutate(!!nested_tax_level := replace(!!sym(nested_tax_level),
+                                           !!sym(nested_tax_level) == na_sym,
+                                           NA)) %>%
+      as.matrix()
+  }
 
   # Loop through each top_tax_level and get the top n nested_tax_level taxa
   lvls <- unique(taxa[,top_tax_level])
   top_nest <- list()
   for (lvl in lvls){
 
-    # Get the taxids within the top_lvl
+    # Get the taxids of all nested_taxa within the current top_level taxon.
+    # Do not include taxa where nested_level is NA
     taxids <- tax_table(ps_obj_nest) %>%
       data.frame(taxid = row.names(.)) %>%
-      filter(!!as.symbol(top_tax_level) == lvl) %>%
+      filter(!!as.symbol(top_tax_level) == lvl,
+             !is.na(!!as.symbol(nested_tax_level))) %>%
       pull(taxid)
-    ps_obj_tmp <- collapse_taxa(ps_obj_nest, taxids, discard_other = T) %>%
-      suppressWarnings()
 
-    # Get the top n nested_tax_level taxa and merge other taxa
+    # If no nested_level annotations are available, do include taxa
+    # where nested_level is NA
+    if (length(taxids) == 0){
+      taxids <- tax_table(ps_obj_nest) %>%
+        data.frame(taxid = row.names(.)) %>%
+        filter(!!as.symbol(top_tax_level) == lvl) %>%
+        pull(taxid)
+    }
+
+    # Remove all other taxa
+    ps_obj_tmp <- collapse_taxa(ps_obj_nest, taxids, discard_other = T) %>%
+        suppressWarnings()
+
+    # Convert na_sym back to NA in the temporary object
+    tax_table(ps_obj_tmp) <- tax_table(ps_obj_tmp) %>%
+      data.frame() %>%
+      mutate(!!nested_tax_level := replace(!!sym(nested_tax_level),
+                                           !!sym(nested_tax_level) == na_sym,
+                                           NA)) %>%
+      as.matrix()
+
+    # Get the top n nested_tax_level taxa
     top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...) %>%
       suppressWarnings()
+
+    # Merge all other taxa, including the NA taxa
     to_merge <- taxa_names(ps_obj_tmp) %>%
       .[!. %in% top_nest[[lvl]]$taxid]
-    ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge) %>%
+    na_taxids <- tax_table(ps_obj_nest) %>%
+      data.frame(taxid = row.names(.)) %>%
+      filter(!!as.symbol(top_tax_level) == lvl,
+             is.na(!!as.symbol(nested_tax_level))) %>%
+      pull(taxid)
+    to_merge <- c(to_merge, na_taxids)
+    ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge, 1) %>%
       suppressWarnings()
   }
 
@@ -327,7 +411,9 @@ collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, merged_la
     # Update the taxon name to merged_label
     tax_tbl <- phyloseq::tax_table(ps_obj)
     indx <- which(row.names(tax_tbl) %in% to_merge)
-    tax_tbl[indx, ] <- merged_label
+    for (i in indx){
+      tax_tbl[i, is.na(tax_tbl[i,])] <- merged_label
+    }
     phyloseq::tax_table(ps_obj) <- tax_tbl
   }
   return(ps_obj)
