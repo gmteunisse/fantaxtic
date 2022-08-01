@@ -157,7 +157,8 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
 #'
 #' The top taxa can be identified based on the absolute abundances or proportions.
 #' When using absolute abundances, please make sure to normalize or rarefy the data
-#' before using this function.
+#' before using this function. If \code{by_proportion = TRUE}, abundances will
+#' be converted to relative abundance before applying \code{FUN}.
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
