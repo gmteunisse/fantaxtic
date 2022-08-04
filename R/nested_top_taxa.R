@@ -101,13 +101,11 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     otu_table(ps_obj) <- phyloseq::otu_table(t(otu_table(ps_obj)), taxa_are_rows = T)
   }
 
-  # Glom taxa at the top level
-  ps_obj_top <- tax_glom(ps_obj, taxrank = top_tax_level)
-
   # Get the top n top_tax_level taxa
-  top_top <- top_taxa(ps_obj_top, n_taxa = n_top_taxa, by_proportion = by_proportion, ...)
+  top_top <- top_taxa(ps_obj, tax_level = top_tax_level, n_taxa = n_top_taxa,
+                      by_proportion = by_proportion, ...)$top_taxa
 
-  # Extract the taxonomy of to the top_tax_level and collapse all othersS
+  # Extract the taxonomy of to the top_tax_level and collapse all others
   ranks <- tax_ranks[1:which(tax_ranks == top_tax_level)]
   if (length(ranks) == 1){
 
@@ -117,6 +115,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
       data.frame(taxid = row.names(.)) %>%
       filter(!!as.symbol(top_tax_level) %in% top_top[[top_tax_level]])
     ps_obj_nest <- collapse_taxa(ps_obj, taxa$taxid, merged_label = top_merged_label)
+
   } else {
 
     # Also check a level above the top level to
@@ -140,25 +139,9 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
                                       ASV = row.names(tax_table(ps_obj_nest)))
     }
   } else {
+
     # If not ASVs, glom at the nested level.
-
-    # Replace nested NAs with a symbol to avoid glomming
-    na_sym <- sprintf("No %s annotation", nested_level)
-    tax_table(ps_obj_nest) <- tax_table(ps_obj_nest) %>%
-      data.frame() %>%
-      mutate(!!nested_tax_level := replace_na(!!sym(nested_tax_level), na_sym)) %>%
-      as.matrix()
-
-    # Glom
-    ps_obj_nest <- tax_glom(ps_obj_nest, taxrank = nested_tax_level)
-
-    # Convert na_sym back to NA
-    tax_table(ps_obj_nest) <- tax_table(ps_obj_nest) %>%
-      data.frame() %>%
-      mutate(!!nested_tax_level := replace(!!sym(nested_tax_level),
-                                           !!sym(nested_tax_level) == na_sym,
-                                           NA)) %>%
-      as.matrix()
+    ps_obj_nest <- tax_glom(ps_obj_nest, taxrank = nested_tax_level, NArm = F)
   }
 
   # Loop through each top_tax_level and get the top n nested_tax_level taxa
@@ -187,16 +170,8 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     ps_obj_tmp <- collapse_taxa(ps_obj_nest, taxids, discard_other = T) %>%
       suppressWarnings()
 
-    # Convert na_sym back to NA in the temporary object
-    tax_table(ps_obj_tmp) <- tax_table(ps_obj_tmp) %>%
-      data.frame() %>%
-      mutate(!!nested_tax_level := replace(!!sym(nested_tax_level),
-                                           !!sym(nested_tax_level) == na_sym,
-                                           NA)) %>%
-      as.matrix()
-
     # Get the top n nested_tax_level taxa
-    top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...) %>%
+    top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...)$top_taxa %>%
       suppressWarnings()
 
     # Merge all other taxa, including the NA taxa
@@ -212,22 +187,20 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
       suppressWarnings()
   }
 
-  # Combine data
+  # Combine the results
   top_nest <- do.call("rbind", top_nest)
 
   # Add top abundances
-  if (by_proportion){
-    top <- top_top %>%
-      select(where(~!all(is.na(.x)))) %>%
-      select(!c(taxid)) %>%
-      rename(top_abundance = abundance,
-             top_tax_rank = tax_rank) %>%
-      left_join(top_nest, .) %>%
-      rename(nested_abundance = abundance,
-             nested_tax_rank = tax_rank) %>%
-      relocate(taxid, top_abundance, nested_abundance, top_tax_rank, nested_tax_rank) %>%
-      suppressMessages()
-  }
+  top <- top_top %>%
+    select(where(~!all(is.na(.x)))) %>%
+    select(!c(taxid)) %>%
+    rename(top_abundance = abundance,
+           top_tax_rank = tax_rank) %>%
+    left_join(top_nest, .) %>%
+    rename(nested_abundance = abundance,
+           nested_tax_rank = tax_rank) %>%
+    relocate(taxid, top_abundance, nested_abundance, top_tax_rank, nested_tax_rank) %>%
+    suppressMessages()
 
   # Update the taxon name to nested_merged_label
   if (include_nested_tax){

@@ -56,39 +56,37 @@
 #' ps_genus <- tax_glom(GlobalPatterns, taxrank = "Genus")
 #' top_taxa(ps_genus, 2)
 #' @export
-top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, FUN = mean, ...){
+top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
+                     by_proportion = TRUE, include_na_taxa = F, merged_label = "Other",
+                     FUN = mean, ...){
 
   # Make sure taxa are rows
   if (!phyloseq::taxa_are_rows(ps_obj)) {
     otu_table(ps_obj) <- phyloseq::otu_table(t(otu_table(ps_obj)), taxa_are_rows = T)
   }
 
-  # Objects with a single taxon cause errors
-  if (ntaxa(ps_obj) > 1){
-    #Check for empty samples
-    smpl_sms <- phyloseq::sample_sums(ps_obj)
-    if (0 %in% smpl_sms){
-      msg <- sprintf("Warning: some samples contain 0 reads. The following samples have been removed from the analysis:\n%s",
-                     paste(names(smpl_sms)[smpl_sms == 0], collapse = "\n"))
-      warning(msg)
-      ps_obj <- phyloseq::subset_samples(ps_obj, smpl_sms > 0)
+  # Check arguments
+  tax_ranks <- rank_names(ps_obj)
+  if(!is.null(tax_level)){
+    if (tax_level == "ASV" & !"ASV" %in% tax_ranks){
+      tax_ranks <- c(tax_ranks, "ASV")
     }
-
-    #Use relative abundances if requested
-    if (by_proportion){
-      otu_tab <- apply(otu_table(ps_obj), 2, function(x){
-        x / sum (x)
-      })
-      phyloseq::otu_table(ps_obj) <- phyloseq::otu_table(otu_tab, taxa_are_rows = T)
-    }
-  } else {
-    if (by_proportion){
-      phyloseq::otu_table(ps_obj)[1,] <- 1
+    if (!tax_level %in% tax_ranks){
+      msg <- sprintf("Error: tax_level %s not in rank_names(ps_obj)", tax_rank)
+      stop(msg)
     }
   }
 
+  #Check for empty samples
+  smpl_sms <- phyloseq::sample_sums(ps_obj)
+  if (0 %in% smpl_sms){
+    msg <- sprintf("Warning: some samples contain 0 reads. The following samples have been removed from the analysis:\n%s",
+                   paste(names(smpl_sms)[smpl_sms == 0], collapse = "\n"))
+    warning(msg)
+    ps_obj <- phyloseq::subset_samples(ps_obj, smpl_sms > 0)
+  }
 
-  # Get the top taxa
+  # Check the grouping
   if(!is.null(grouping)){
 
     # Check whether groups exist
@@ -100,23 +98,61 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
     }
   }
 
-  # Get the top taxa per group
-  top <- otu_table(ps_obj) %>%
+  # Gom and merge taxa when tax_level is specified
+  merged_taxid <- NULL
+  if(!is.null(tax_level)){
+    if(tax_level != "ASV"){
+
+      # Glom taxa
+      ps_tmp <- tax_glom(ps_obj, taxrank = tax_level, NArm = FALSE)
+
+      # Merge NA taxa
+      if (!include_na_taxa){
+        taxids <- tax_table(ps_tmp) %>%
+          data.frame(taxid = row.names(.)) %>%
+          filter(!is.na(!!sym(tax_level))) %>%
+          pull(taxid)
+        ps_tmp <- collapse_taxa(ps_tmp, taxa_to_keep = taxids, discard_other = F, merged_label = merged_label)
+
+        #Get the taxid
+        merged_taxid <- tax_table(ps_tmp) %>%
+          data.frame(taxid = row.names(.)) %>%
+          filter(!!sym(tax_level) == merged_label) %>%
+          pull(taxid)
+      }
+    }
+  } else {
+    ps_tmp <- ps_obj
+  }
+
+  # Convert to long
+  ps_long <- otu_table(ps_tmp) %>%
     data.frame(taxid = row.names(.)) %>%
     pivot_longer(!taxid, names_to = "sample_id", values_to = "abundance") %>%
-    left_join(sample_data(ps_obj) %>%
+    left_join(sample_data(ps_tmp) %>%
                 data.frame(sample_id = row.names(.)),
-              by = "sample_id") %>%
+              by = "sample_id")
+
+  # Calculate relative abundances
+  if (by_proportion){
+    ps_long <- ps_long %>%
+      group_by(sample_id) %>%
+      mutate(abundance = abundance / sum(abundance))
+  }
+
+  # Get the top taxa
+  top <- ps_long %>%
     group_by(across(all_of(!!grouping))) %>%
     group_by(taxid, .add = T) %>%
     summarise(abundance = FUN(abundance, ...), .groups = "keep") %>%
     group_by(across(all_of(!!grouping))) %>%
+    filter(!taxid %in% merged_taxid) %>%
     slice_max(abundance, n = n_taxa) %>%
     arrange(desc(abundance), .by_group = TRUE) %>%
     mutate(tax_rank = rank(x = -abundance, ties.method = "first", na.last = T))
 
   # Add taxonomic annotations
-  top <- ps_obj %>%
+  top <- ps_tmp %>%
     tax_table() %>%
     data.frame(taxid = row.names(.)) %>%
     right_join(top, by = "taxid")
@@ -125,5 +161,11 @@ top_taxa <- function(ps_obj, n_taxa = 1, grouping = NULL, by_proportion = TRUE, 
   top <- top %>%
     relocate(all_of(!!grouping), tax_rank, taxid, abundance)
 
-  return(top)
+  # Update the phyloseq object
+  ps_tmp <- collapse_taxa(ps_tmp, taxa_to_keep = top$taxid, discard_other = F,
+                          merged_label = merged_label)
+
+  return(list(ps_obj = ps_tmp,
+              top_taxa = top))
+
 }
