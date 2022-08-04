@@ -54,7 +54,7 @@ collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, merged_la
     # Merge taxa
     to_merge <- phyloseq::taxa_names(ps_obj)
     to_merge <- to_merge[!(to_merge %in% taxa_to_keep)]
-    ps_obj <- merge_taxa(ps_obj, to_merge)
+    ps_obj <- merge_taxa(ps_obj, to_merge, archetype = 1)
 
     # Update the taxon name to merged_label
     tax_tbl <- phyloseq::tax_table(ps_obj)
