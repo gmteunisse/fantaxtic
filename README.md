@@ -257,7 +257,7 @@ colours between different plots.
 plot_nested_bar(top_nested$ps_obj,
                 top_level = "Phylum",
                 nested_level = "Species",
-                nested_merged_label = "NA and other <tax>",
+                nested_merged_label = "NA and other",
                 palette = c(Bacteroidetes = "red", 
                             Proteobacteria = "blue"),
                 merged_clr = "black")
@@ -296,7 +296,8 @@ sample_order <- psmelt(top_nested$ps_obj) %>%
 plot_nested_bar(top_nested$ps_obj,
                 "Phylum",
                 "Species",
-                sample_order = sample_order)
+                sample_order = sample_order,
+                nested_merged_label = "NA and other")
 ```
 
 ![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
