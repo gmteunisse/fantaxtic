@@ -43,6 +43,7 @@ require("tidyverse")
 require("magrittr")
 require("ggnested")
 require("knitr")
+require("gridExtra")
 ```
 
 ```{r, fig.width = 6, fig.height = 6}
@@ -274,8 +275,6 @@ p
 This function generates a colour for each taxon at a specified rank in a phyloseq object. Custom palettes can also be provided, and if they are named, colours wil be assigned appropriately.
 
 ```{r, fig.width = 6, fig.height = 3}
-require("gridExtra")
-
 # Function to plot the colours in a palette
 plot_colours <- function(pal){
   pal %>%
@@ -343,7 +342,8 @@ Another issue is that a single taxon may be represented by multiple ASVs, especi
 ```{r}
 # Label the lowest non-NA level
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj)
-tax_table(ps_tmp)
+tax_table(ps_tmp)  %>%
+  kable(format = "markdown")
 ```
 
 ```{r}

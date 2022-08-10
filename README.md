@@ -394,15 +394,6 @@ phyloseq object. Custom palettes can also be provided, and if they are
 named, colours wil be assigned appropriately.
 
 ``` r
-require("gridExtra")
-#> Loading required package: gridExtra
-#> Warning: package 'gridExtra' was built under R version 4.1.3
-#> 
-#> Attaching package: 'gridExtra'
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     combine
-
 # Function to plot the colours in a palette
 plot_colours <- function(pal){
   pal %>%
@@ -517,33 +508,23 @@ specified, it will only do it at that rank.
 ``` r
 # Label the lowest non-NA level
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj)
-tax_table(ps_tmp)
-#> Taxonomy Table:     [11 taxa by 7 taxonomic ranks]:
-#>        Kingdom    Phylum           Class                 Order              
-#> 549322 "Other"    "Other"          "Other"               "Other"            
-#> 329744 "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"  
-#> 317182 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles 1"  
-#> 549656 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles 2"  
-#> 279599 "Bacteria" "Cyanobacteria"  "Nostocophycideae"    "Nostocales"       
-#> 360229 "Bacteria" "Proteobacteria" "Betaproteobacteria"  "Neisseriales"     
-#> 94166  "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pasteurellales"   
-#> 550960 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Enterobacteriales"
-#> 158660 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 331820 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 98605  "Bacteria" "Firmicutes"     "Bacilli"             "Lactobacillales"  
-#>        Family               Genus            Species                    
-#> 549322 "Other"              "Other"          "Other"                    
-#> 329744 "ACK-M1"             NA               NA                         
-#> 317182 NA                   NA               NA                         
-#> 549656 NA                   NA               NA                         
-#> 279599 "Nostocaceae"        "Dolichospermum" NA                         
-#> 360229 "Neisseriaceae"      "Neisseria"      NA                         
-#> 94166  "Pasteurellaceae"    "Haemophilus"    "Haemophilusparainfluenzae"
-#> 550960 "Enterobacteriaceae" "Providencia"    NA                         
-#> 158660 "Bacteroidaceae"     "Bacteroides 1"  NA                         
-#> 331820 "Bacteroidaceae"     "Bacteroides 2"  NA                         
-#> 98605  "Streptococcaceae"   "Streptococcus"  "Streptococcussanguinis"
+tax_table(ps_tmp)  %>%
+  kable(format = "markdown")
 ```
+
+|        | Kingdom  | Phylum         | Class               | Order             | Family             | Genus          | Species                   |
+|:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:---------------|:--------------------------|
+| 549322 | Other    | Other          | Other               | Other             | Other              | Other          | Other                     |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA             | NA                        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles 1   | NA                 | NA             | NA                        |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles 2   | NA                 | NA             | NA                        |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum | NA                        |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 1  | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 2  | NA                        |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
 
 ``` r
 # Use ASVs as ids rather than counts
