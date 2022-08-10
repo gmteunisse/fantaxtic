@@ -120,7 +120,7 @@ NULL
 #' @export
 gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
 
-  .Deprecated(new = "nested_palette", package = "ggnested")
+  .Deprecated(new = "nested_palette")
 
   #Define a palette
   base_pal <- c("#6495ed", "#ff7256", "#edbc64", "#8470ff", "#8ee5ee", "#EE8DD6")
@@ -253,7 +253,7 @@ NULL
 
 #' @rdname fantaxtic-deprecated
 #' @section fantaxtic_bar:
-#' For \code{fantaxtic_bar}, use \code{\link{fantaxtic}}.
+#' For \code{fantaxtic_bar}, use \code{\link{plot_nested_bar}}.
 #'
 #' @export
 fantaxtic_bar <- function(physeq_obj, color_by, label_by = NULL, facet_by = NULL,
@@ -478,7 +478,7 @@ NULL
 #' @export
 gen_colors <- function(n, clr = "#6495ed"){
 
-  .Deprecated(new = "nested_palette", package = "ggnested")
+  .Deprecated(new = "nested_palette")
   if (n == 1){
     return(clr)
   }
@@ -523,7 +523,7 @@ NULL
 #' @export
 shuffle_colors <- function(clrs){
 
-  .Deprecated(new = "nested_palette", package = "ggnested")
+  .Deprecated(new = "nested_palette")
 
   n.col <- length(clrs)
   ordr <- rep(1:ceiling(n.col/2), each = 2, length.out = n.col)
@@ -563,7 +563,7 @@ NULL
 #' @export
 gen_shades_tints <- function(i, clr = "#6495ed"){
 
-  .Deprecated(new = "nested_palette", package = "ggnested")
+  .Deprecated(new = "nested_palette")
   if (i == 0){
     return(c())
   }
@@ -624,4 +624,143 @@ gen_tints <- function(i, clr = "#6495ed", incl.base = FALSE){
   return(tnts[1:i+1])
 }
 
+#' Generate unique labels.
+#'
+#' This function generates unique labels for an input vector by adding a
+#' count to labels of which multiple occurrences are found.
+#'
+#' @param lbls A vector of labels for which to generate unique names.
+#' @param sep_char A (combination of) characters with which to separate labels
+#' and their unique counts.
+#' @return A factor of unique labels.
+#'
+#' @name gen_uniq_lbls-deprecated
+#' @seealso \code{\link{fantaxtic-deprecated}}
+#' @usage gen_uniq_lbls(lbls, sep_char = " ")
+#'
+#' @examples
+#' lbls <- as.character(c("A", "B", "B", "C", "C", "C", "D"))
+#' gen_uniq_lbls(lbls)
+#' gen_uniq_lbls(lbls, sep_char = "_")
+#'
+#' #Also works with factors or numerics
+#' gen_uniq_lvls(as.factor(lbls))
+#' lbls <- as.numeric(c(1, 2, 2, 3, 3, 3, 4))
+#' gen_uniq_lbls(lbls)
+NULL
+
+#' @rdname fantaxtic-deprecated
+#' @section gen_uniq_lbls:
+#' For \code{gen_uniq_lbls}, use \code{\link{name_na_taxa}} or \code{\link{label_duplicate_taxa}}.
+#'
+#' @export
+gen_uniq_lbls <- function(lbls, sep_char = " "){
+
+  .Deprecated(new = c("name_na_taxa", "label_duplicate_taxa"))
+
+  lbls <- as.character(lbls)
+  lbl_tbl <- as.data.frame(table(lbls))
+  dupl <- which(lbl_tbl$Freq > 1)
+  names(dupl) <- lbl_tbl$lbls[dupl]
+  if(length(dupl) > 0){
+    ind <- unlist(sapply(dupl, function(x){
+      which(lbls %in% lbl_tbl$lbls[x])
+    }))
+    lbls_new <- unlist(sapply(dupl, function(x){
+      paste(lbl_tbl$lbls[x], 1:lbl_tbl$Freq[x], sep = sep_char)
+    }))
+    lbls[ind] <- lbls_new
+  }
+  lbls <- factor(lbls, unique(lbls), ordered = T)
+  return(lbls)
+}
+
+#' Add names for missing taxon names in phyloseq objects
+#'
+#' This function adds names for OTUs/ASVs with incomplete taxonomic
+#' annotations, i.e. annotation is only available up to a certain
+#' taxonomic rank. It replaces \code{NA} values with the lowest
+#' available taxonomic annotation for an OTU/ASV and a label indicating
+#' that the annotation is unknown. Species can be renamed to genus +
+#' species if desired. To avoid downstream problem, it numbers
+#' taxa with the same taxonomic annotation but different sequences.
+#'
+#' @param physeq_obj A phyloseq object with a \code{tax_table}.
+#' @param label Label to prepend the taxon name with (default =
+#' \code{"Unknown"}).
+#' @param other_label The label(s) of samples whose names should not be altered.
+#' @param species Generate a 'Genus species' (i.e. 'Escherichia Coli') label
+#' for the species level?
+#' @param unique_rank The taxonomic rank by which to generate unique labels
+#' (added number) if desired (default = \code{"Unannotated"}).
+#' @param unique_sep The text character(s) by which to separate the annotation
+#' and the unique number (only when \code{!is.null(unique_rank)}).
+#'
+#' @name namep_taxa-deprecated
+#' @seealso \code{\link{fantaxtic-deprecated}}
+#' @usage name_taxa(physeq_obj, label = "Unannotated", other_label = NULL, species = FALSE, unique_rank = NULL, unique_sep = " ")
+#' @examples
+#' data(GlobalPatterns)
+#' name_taxa(GlobalPatterns)
+#' name_taxa(GlobalPatterns, label = "Unannotated")
+NULL
+
+#' @rdname fantaxtic-deprecated
+#' @section name_taxa:
+#' For \code{name_taxa}, use \code{\link{name_na_taxa}} or \code{\link{label_duplicate_taxa}}.
+#'
+#' @export
+name_taxa <- function(physeq_obj, label = "Unannotated", other_label = NULL, species = FALSE, unique_rank = NULL, unique_sep = " "){
+
+  .Deprecated(new = c("name_na_taxa", "label_duplicate_taxa"))
+
+  #Get the tax table
+  tax_tbl <- phyloseq::tax_table(physeq_obj)
+
+  #Store the names
+  tax_names <- colnames(tax_tbl)
+
+  #Change any NA value to the lowest available taxonomic
+  #annotation of that OTU/ASV
+  tax_tbl <- t(apply(tax_tbl, 1, function(x){
+    n <- length(x)
+    if (sum(is.na(x)) == n){
+      tax_ranks <- rep(label, n)
+    } else {
+      if (sum(is.na(x)) != 0){
+        i <- max(which(!is.na(x)))
+        rank <- x[i] #The last known rank
+        x[which(is.na(x))] <- sprintf("%s %s (%s)", label, rank, names(x)[i])
+      } else {
+        if (!is.null(other_label)){
+          if (sum(other_label %in%  x) > 0){
+            tax_ranks <- x
+          } else {
+            if (species){
+              x[n] <- sprintf("%s %s", x[n-1], x[n])
+            }
+          }
+        } else {
+          if (species){
+            x[n] <- sprintf("%s %s", x[n-1], x[n])
+          }
+        }
+      }
+      tax_ranks <- x
+      return(tax_ranks)
+    }
+  }))
+
+  #Generate unique labels, i.e. add a number on the desired taxonomic level
+  if (!is.null(unique_rank)){
+    ind <- which(colnames(tax_tbl) == unique_rank)
+    tax_tbl[,ind] <- as.character(tax_tbl[,ind])
+    tax_tbl[,ind] <- as.character(gen_uniq_lbls(tax_tbl[,ind], sep_char = unique_sep))
+  }
+
+  #Update the phyloseq object
+  phyloseq::tax_table(physeq_obj) <- tax_tbl
+  colnames(phyloseq::tax_table(physeq_obj)) <- tax_names
+  return(physeq_obj)
+}
 
