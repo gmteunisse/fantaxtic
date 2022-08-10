@@ -46,50 +46,12 @@ using Phylum as the top rank and Species as the nested rank, run:
 ``` r
 data(GlobalPatterns)
 top_asv <- top_taxa(GlobalPatterns, n_taxa = 10)
-top_asv$top_taxa %>%
-  mutate(abundance = round(abundance, 3))
-#>    tax_rank  taxid abundance  Kingdom         Phylum               Class
-#> 1         7 329744     0.013 Bacteria Actinobacteria      Actinobacteria
-#> 2         8 317182     0.012 Bacteria  Cyanobacteria         Chloroplast
-#> 3         1 549656     0.055 Bacteria  Cyanobacteria         Chloroplast
-#> 4         3 279599     0.020 Bacteria  Cyanobacteria    Nostocophycideae
-#> 5         9 360229     0.012 Bacteria Proteobacteria  Betaproteobacteria
-#> 6         5  94166     0.014 Bacteria Proteobacteria Gammaproteobacteria
-#> 7         4 550960     0.014 Bacteria Proteobacteria Gammaproteobacteria
-#> 8        10 158660     0.011 Bacteria  Bacteroidetes         Bacteroidia
-#> 9         2 331820     0.025 Bacteria  Bacteroidetes         Bacteroidia
-#> 10        6  98605     0.013 Bacteria     Firmicutes             Bacilli
-#>                Order             Family          Genus
-#> 1    Actinomycetales             ACK-M1           <NA>
-#> 2      Stramenopiles               <NA>           <NA>
-#> 3      Stramenopiles               <NA>           <NA>
-#> 4         Nostocales        Nostocaceae Dolichospermum
-#> 5       Neisseriales      Neisseriaceae      Neisseria
-#> 6     Pasteurellales    Pasteurellaceae    Haemophilus
-#> 7  Enterobacteriales Enterobacteriaceae    Providencia
-#> 8      Bacteroidales     Bacteroidaceae    Bacteroides
-#> 9      Bacteroidales     Bacteroidaceae    Bacteroides
-#> 10   Lactobacillales   Streptococcaceae  Streptococcus
-#>                      Species
-#> 1                       <NA>
-#> 2                       <NA>
-#> 3                       <NA>
-#> 4                       <NA>
-#> 5                       <NA>
-#> 6  Haemophilusparainfluenzae
-#> 7                       <NA>
-#> 8                       <NA>
-#> 9                       <NA>
-#> 10    Streptococcussanguinis
-```
-
-``` r
 plot_nested_bar(ps_obj = top_asv$ps_obj,
                 top_level = "Phylum",
                 nested_level = "Species")
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
 
 To identify and plot the top 3 most abundant Phyla, and the top 3 most
 abundant species within those Phyla, run:
@@ -100,48 +62,12 @@ top_nested <- nested_top_taxa(GlobalPatterns,
                               nested_tax_level = "Species",
                               n_top_taxa = 3, 
                               n_nested_taxa = 3)
-top_nested$top_taxa %>%
-  mutate(top_abundance = round(top_abundance, 3),
-         nested_abundance = round(nested_abundance, 3))
-#>    taxid top_abundance nested_abundance top_tax_rank nested_tax_rank  Kingdom
-#> 1 200741         0.295            0.072            1               3 Bacteria
-#> 2  94166         0.295            0.122            1               1 Bacteria
-#> 3 236788         0.295            0.094            1               2 Bacteria
-#> 4 322235         0.173            0.110            3               2 Bacteria
-#> 5 471122         0.173            0.147            3               1 Bacteria
-#> 6 248140         0.173            0.076            3               3 Bacteria
-#> 7 171551         0.189            0.162            2               1 Bacteria
-#> 8  98605         0.189            0.116            2               2 Bacteria
-#> 9 114821         0.189            0.089            2               3 Bacteria
-#>           Phylum               Class             Order             Family
-#> 1 Proteobacteria  Betaproteobacteria   Burkholderiales               <NA>
-#> 2 Proteobacteria Gammaproteobacteria    Pasteurellales    Pasteurellaceae
-#> 3 Proteobacteria Gammaproteobacteria Enterobacteriales Enterobacteriaceae
-#> 4  Bacteroidetes         Bacteroidia     Bacteroidales     Bacteroidaceae
-#> 5  Bacteroidetes         Bacteroidia     Bacteroidales     Prevotellaceae
-#> 6  Bacteroidetes         Bacteroidia     Bacteroidales     Bacteroidaceae
-#> 7     Firmicutes          Clostridia     Clostridiales    Ruminococcaceae
-#> 8     Firmicutes             Bacilli   Lactobacillales   Streptococcaceae
-#> 9     Firmicutes          Clostridia     Clostridiales    Veillonellaceae
-#>              Genus                     Species
-#> 1      Methylibium   Methylibiumpetroleiphilum
-#> 2      Haemophilus   Haemophilusparainfluenzae
-#> 3     Edwardsiella        Edwardsiellaictaluri
-#> 4      Bacteroides        Bacteroidesuniformis
-#> 5       Prevotella    Prevotellamelaninogenica
-#> 6      Bacteroides           Bacteroidescaccae
-#> 7 Faecalibacterium Faecalibacteriumprausnitzii
-#> 8    Streptococcus      Streptococcussanguinis
-#> 9      Veillonella          Veillonellaparvula
-```
-
-``` r
 plot_nested_bar(ps_obj = top_nested$ps_obj,
                 top_level = "Phylum",
                 nested_level = "Species")
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
 
 ### `top_taxa`
 
@@ -153,7 +79,7 @@ object in which all other taxa have been merged into a single taxon.
 
 #### Taxonomic rank
 
-By default, it runs the analysis at the ASV level; however, if a
+By default, `top_taxa` runs the analysis at the ASV level; however, if a
 `tax_level` is specified (e.g. `Species`), it first agglomerates the
 taxa in the phyloseq object at that rank and then runs the analysis.
 Note that taxonomic agglomeration makes the assumption that taxa with
@@ -167,41 +93,22 @@ top_species <- top_taxa(GlobalPatterns,
                         n_taxa = 10, 
                         tax_level = "Species")
 top_species$top_taxa %>%
-  mutate(abundance = round(abundance, 3))
-#>    tax_rank  taxid abundance  Kingdom         Phylum               Class
-#> 1         4 326977     0.010 Bacteria Actinobacteria      Actinobacteria
-#> 2         9   9514     0.005 Bacteria Proteobacteria Gammaproteobacteria
-#> 3         1  94166     0.014 Bacteria Proteobacteria Gammaproteobacteria
-#> 4         8 469778     0.005 Bacteria  Bacteroidetes         Bacteroidia
-#> 5         6 471122     0.006 Bacteria  Bacteroidetes         Bacteroidia
-#> 6        10 248140     0.005 Bacteria  Bacteroidetes         Bacteroidia
-#> 7         7 470973     0.005 Bacteria     Firmicutes          Clostridia
-#> 8         3 171551     0.011 Bacteria     Firmicutes          Clostridia
-#> 9         2  98605     0.013 Bacteria     Firmicutes             Bacilli
-#> 10        5 114821     0.009 Bacteria     Firmicutes          Clostridia
-#>                Order             Family            Genus
-#> 1  Bifidobacteriales Bifidobacteriaceae  Bifidobacterium
-#> 2     Pasteurellales    Pasteurellaceae   Actinobacillus
-#> 3     Pasteurellales    Pasteurellaceae      Haemophilus
-#> 4      Bacteroidales     Bacteroidaceae      Bacteroides
-#> 5      Bacteroidales     Prevotellaceae       Prevotella
-#> 6      Bacteroidales     Bacteroidaceae      Bacteroides
-#> 7      Clostridiales    Lachnospiraceae     Ruminococcus
-#> 8      Clostridiales    Ruminococcaceae Faecalibacterium
-#> 9    Lactobacillales   Streptococcaceae    Streptococcus
-#> 10     Clostridiales    Veillonellaceae      Veillonella
-#>                        Species
-#> 1  Bifidobacteriumadolescentis
-#> 2       Actinobacillusporcinus
-#> 3    Haemophilusparainfluenzae
-#> 4       Bacteroidescoprophilus
-#> 5     Prevotellamelaninogenica
-#> 6            Bacteroidescaccae
-#> 7          Ruminococcustorques
-#> 8  Faecalibacteriumprausnitzii
-#> 9       Streptococcussanguinis
-#> 10          Veillonellaparvula
+  mutate(abundance = round(abundance, 3)) %>%
+  kable(format = "markdown")
 ```
+
+| tax_rank | taxid  | abundance | Kingdom  | Phylum         | Class               | Order             | Family             | Genus            | Species                     |
+|---------:|:-------|----------:|:---------|:---------------|:--------------------|:------------------|:-------------------|:-----------------|:----------------------------|
+|        4 | 326977 |     0.010 | Bacteria | Actinobacteria | Actinobacteria      | Bifidobacteriales | Bifidobacteriaceae | Bifidobacterium  | Bifidobacteriumadolescentis |
+|        9 | 9514   |     0.005 | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Actinobacillus   | Actinobacillusporcinus      |
+|        1 | 94166  |     0.014 | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus      | Haemophilusparainfluenzae   |
+|        8 | 469778 |     0.005 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | Bacteroidescoprophilus      |
+|        6 | 471122 |     0.006 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Prevotellaceae     | Prevotella       | Prevotellamelaninogenica    |
+|       10 | 248140 |     0.005 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | Bacteroidescaccae           |
+|        7 | 470973 |     0.005 | Bacteria | Firmicutes     | Clostridia          | Clostridiales     | Lachnospiraceae    | Ruminococcus     | Ruminococcustorques         |
+|        3 | 171551 |     0.011 | Bacteria | Firmicutes     | Clostridia          | Clostridiales     | Ruminococcaceae    | Faecalibacterium | Faecalibacteriumprausnitzii |
+|        2 | 98605  |     0.013 | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus    | Streptococcussanguinis      |
+|        5 | 114821 |     0.009 | Bacteria | Firmicutes     | Clostridia          | Clostridiales     | Veillonellaceae    | Veillonella      | Veillonellaparvula          |
 
 #### Grouping
 
@@ -217,38 +124,21 @@ top_grouped <- top_taxa(GlobalPatterns,
                         n_taxa = 1,
                         grouping = "SampleType")
 top_grouped$top_taxa %>%
-  mutate(abundance = round(abundance, 3))
-#>           SampleType tax_rank  taxid abundance  Kingdom         Phylum
-#> 1 Freshwater (creek)        1 549656     0.464 Bacteria  Cyanobacteria
-#> 2         Freshwater        1 279599     0.216 Bacteria  Cyanobacteria
-#> 3              Ocean        1 557211     0.071 Bacteria  Cyanobacteria
-#> 4             Tongue        1 360229     0.145 Bacteria Proteobacteria
-#> 5               Mock        1 550960     0.117 Bacteria Proteobacteria
-#> 6 Sediment (estuary)        1 319044     0.080 Bacteria Proteobacteria
-#> 7              Feces        1 331820     0.137 Bacteria  Bacteroidetes
-#> 8               Soil        1  36155     0.013 Bacteria  Acidobacteria
-#> 9               Skin        1  98605     0.103 Bacteria     Firmicutes
-#>                   Class             Order             Family
-#> 1           Chloroplast     Stramenopiles               <NA>
-#> 2      Nostocophycideae        Nostocales        Nostocaceae
-#> 3 Synechococcophycideae   Synechococcales   Synechococcaceae
-#> 4    Betaproteobacteria      Neisseriales      Neisseriaceae
-#> 5   Gammaproteobacteria Enterobacteriales Enterobacteriaceae
-#> 6   Deltaproteobacteria Desulfobacterales   Desulfobulbaceae
-#> 7           Bacteroidia     Bacteroidales     Bacteroidaceae
-#> 8          Solibacteres    Solibacterales    Solibacteraceae
-#> 9               Bacilli   Lactobacillales   Streptococcaceae
-#>                  Genus                Species
-#> 1                 <NA>                   <NA>
-#> 2       Dolichospermum                   <NA>
-#> 3      Prochlorococcus                   <NA>
-#> 4            Neisseria                   <NA>
-#> 5          Providencia                   <NA>
-#> 6                 <NA>                   <NA>
-#> 7          Bacteroides                   <NA>
-#> 8 CandidatusSolibacter                   <NA>
-#> 9        Streptococcus Streptococcussanguinis
+  mutate(abundance = round(abundance, 3)) %>%
+  kable(format = "markdown")
 ```
+
+| SampleType         | tax_rank | taxid  | abundance | Kingdom  | Phylum         | Class                 | Order             | Family             | Genus                | Species                |
+|:-------------------|---------:|:-------|----------:|:---------|:---------------|:----------------------|:------------------|:-------------------|:---------------------|:-----------------------|
+| Freshwater (creek) |        1 | 549656 |     0.464 | Bacteria | Cyanobacteria  | Chloroplast           | Stramenopiles     | NA                 | NA                   | NA                     |
+| Freshwater         |        1 | 279599 |     0.216 | Bacteria | Cyanobacteria  | Nostocophycideae      | Nostocales        | Nostocaceae        | Dolichospermum       | NA                     |
+| Ocean              |        1 | 557211 |     0.071 | Bacteria | Cyanobacteria  | Synechococcophycideae | Synechococcales   | Synechococcaceae   | Prochlorococcus      | NA                     |
+| Tongue             |        1 | 360229 |     0.145 | Bacteria | Proteobacteria | Betaproteobacteria    | Neisseriales      | Neisseriaceae      | Neisseria            | NA                     |
+| Mock               |        1 | 550960 |     0.117 | Bacteria | Proteobacteria | Gammaproteobacteria   | Enterobacteriales | Enterobacteriaceae | Providencia          | NA                     |
+| Sediment (estuary) |        1 | 319044 |     0.080 | Bacteria | Proteobacteria | Deltaproteobacteria   | Desulfobacterales | Desulfobulbaceae   | NA                   | NA                     |
+| Feces              |        1 | 331820 |     0.137 | Bacteria | Bacteroidetes  | Bacteroidia           | Bacteroidales     | Bacteroidaceae     | Bacteroides          | NA                     |
+| Soil               |        1 | 36155  |     0.013 | Bacteria | Acidobacteria  | Solibacteres          | Solibacterales    | Solibacteraceae    | CandidatusSolibacter | NA                     |
+| Skin               |        1 | 98605  |     0.103 | Bacteria | Firmicutes     | Bacilli               | Lactobacillales   | Streptococcaceae   | Streptococcus        | Streptococcussanguinis |
 
 #### Ranking metric
 
@@ -263,30 +153,22 @@ top_max <- top_taxa(GlobalPatterns,
                         n_taxa = 10,
                         FUN = max)
 top_max$top_taxa %>%
-  mutate(abundance = round(abundance, 3))
-#>    tax_rank  taxid abundance  Kingdom         Phylum               Class
-#> 1         4 329744     0.266 Bacteria Actinobacteria      Actinobacteria
-#> 2         1 549656     0.500 Bacteria  Cyanobacteria         Chloroplast
-#> 3         2 279599     0.432 Bacteria  Cyanobacteria    Nostocophycideae
-#> 4         3 360229     0.270 Bacteria Proteobacteria  Betaproteobacteria
-#> 5         8  94166     0.198 Bacteria Proteobacteria Gammaproteobacteria
-#> 6         9 484436     0.196 Bacteria Proteobacteria Gammaproteobacteria
-#> 7         5 331820     0.230 Bacteria  Bacteroidetes         Bacteroidia
-#> 8         7 189047     0.207 Bacteria     Firmicutes          Clostridia
-#> 9         6  98605     0.223 Bacteria     Firmicutes             Bacilli
-#> 10       10 114821     0.187 Bacteria     Firmicutes          Clostridia
-#>              Order           Family          Genus                   Species
-#> 1  Actinomycetales           ACK-M1           <NA>                      <NA>
-#> 2    Stramenopiles             <NA>           <NA>                      <NA>
-#> 3       Nostocales      Nostocaceae Dolichospermum                      <NA>
-#> 4     Neisseriales    Neisseriaceae      Neisseria                      <NA>
-#> 5   Pasteurellales  Pasteurellaceae    Haemophilus Haemophilusparainfluenzae
-#> 6  Pseudomonadales    Moraxellaceae           <NA>                      <NA>
-#> 7    Bacteroidales   Bacteroidaceae    Bacteroides                      <NA>
-#> 8    Clostridiales  Ruminococcaceae           <NA>                      <NA>
-#> 9  Lactobacillales Streptococcaceae  Streptococcus    Streptococcussanguinis
-#> 10   Clostridiales  Veillonellaceae    Veillonella        Veillonellaparvula
+  mutate(abundance = round(abundance, 3)) %>%
+  kable(format = "markdown")
 ```
+
+| tax_rank | taxid  | abundance | Kingdom  | Phylum         | Class               | Order           | Family           | Genus          | Species                   |
+|---------:|:-------|----------:|:---------|:---------------|:--------------------|:----------------|:-----------------|:---------------|:--------------------------|
+|        4 | 329744 |     0.266 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales | ACK-M1           | NA             | NA                        |
+|        1 | 549656 |     0.500 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles   | NA               | NA             | NA                        |
+|        2 | 279599 |     0.432 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales      | Nostocaceae      | Dolichospermum | NA                        |
+|        3 | 360229 |     0.270 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales    | Neisseriaceae    | Neisseria      | NA                        |
+|        8 | 94166  |     0.198 | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales  | Pasteurellaceae  | Haemophilus    | Haemophilusparainfluenzae |
+|        9 | 484436 |     0.196 | Bacteria | Proteobacteria | Gammaproteobacteria | Pseudomonadales | Moraxellaceae    | NA             | NA                        |
+|        5 | 331820 |     0.230 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales   | Bacteroidaceae   | Bacteroides    | NA                        |
+|        7 | 189047 |     0.207 | Bacteria | Firmicutes     | Clostridia          | Clostridiales   | Ruminococcaceae  | NA             | NA                        |
+|        6 | 98605  |     0.223 | Bacteria | Firmicutes     | Bacilli             | Lactobacillales | Streptococcaceae | Streptococcus  | Streptococcussanguinis    |
+|       10 | 114821 |     0.187 | Bacteria | Firmicutes     | Clostridia          | Clostridiales   | Veillonellaceae  | Veillonella    | Veillonellaparvula        |
 
 ### `nested_top_taxa`
 
@@ -313,47 +195,21 @@ top_nested <- nested_top_taxa(GlobalPatterns,
                               nested_merged_label = "NA and other <tax>")
 top_nested$top_taxa %>%
   mutate(top_abundance = round(top_abundance, 3),
-         nested_abundance = round(nested_abundance, 3))
-#>    taxid top_abundance nested_abundance top_tax_rank nested_tax_rank  Kingdom
-#> 1 200741         0.295            0.072            1               3 Bacteria
-#> 2  94166         0.295            0.122            1               1 Bacteria
-#> 3 236788         0.295            0.094            1               2 Bacteria
-#> 4 322235         0.173            0.110            3               2 Bacteria
-#> 5 471122         0.173            0.147            3               1 Bacteria
-#> 6 248140         0.173            0.076            3               3 Bacteria
-#> 7 171551         0.189            0.162            2               1 Bacteria
-#> 8  98605         0.189            0.116            2               2 Bacteria
-#> 9 114821         0.189            0.089            2               3 Bacteria
-#>           Phylum               Class             Order             Family
-#> 1 Proteobacteria  Betaproteobacteria   Burkholderiales               <NA>
-#> 2 Proteobacteria Gammaproteobacteria    Pasteurellales    Pasteurellaceae
-#> 3 Proteobacteria Gammaproteobacteria Enterobacteriales Enterobacteriaceae
-#> 4  Bacteroidetes         Bacteroidia     Bacteroidales     Bacteroidaceae
-#> 5  Bacteroidetes         Bacteroidia     Bacteroidales     Prevotellaceae
-#> 6  Bacteroidetes         Bacteroidia     Bacteroidales     Bacteroidaceae
-#> 7     Firmicutes          Clostridia     Clostridiales    Ruminococcaceae
-#> 8     Firmicutes             Bacilli   Lactobacillales   Streptococcaceae
-#> 9     Firmicutes          Clostridia     Clostridiales    Veillonellaceae
-#>              Genus                     Species
-#> 1      Methylibium   Methylibiumpetroleiphilum
-#> 2      Haemophilus   Haemophilusparainfluenzae
-#> 3     Edwardsiella        Edwardsiellaictaluri
-#> 4      Bacteroides        Bacteroidesuniformis
-#> 5       Prevotella    Prevotellamelaninogenica
-#> 6      Bacteroides           Bacteroidescaccae
-#> 7 Faecalibacterium Faecalibacteriumprausnitzii
-#> 8    Streptococcus      Streptococcussanguinis
-#> 9      Veillonella          Veillonellaparvula
+         nested_abundance = round(nested_abundance, 3)) %>%
+  kable(format = "markdown")
 ```
 
-``` r
-plot_nested_bar(ps_obj = top_nested$ps_obj,
-                top_level = "Phylum",
-                nested_level = "Species",
-                nested_merged_label = "NA and other <tax>")
-```
-
-![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
+| taxid  | top_abundance | nested_abundance | top_tax_rank | nested_tax_rank | Kingdom  | Phylum         | Class               | Order             | Family             | Genus            | Species                     |
+|:-------|--------------:|-----------------:|-------------:|----------------:|:---------|:---------------|:--------------------|:------------------|:-------------------|:-----------------|:----------------------------|
+| 200741 |         0.295 |            0.072 |            1 |               3 | Bacteria | Proteobacteria | Betaproteobacteria  | Burkholderiales   | NA                 | Methylibium      | Methylibiumpetroleiphilum   |
+| 94166  |         0.295 |            0.122 |            1 |               1 | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus      | Haemophilusparainfluenzae   |
+| 236788 |         0.295 |            0.094 |            1 |               2 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Edwardsiella     | Edwardsiellaictaluri        |
+| 322235 |         0.173 |            0.110 |            3 |               2 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | Bacteroidesuniformis        |
+| 471122 |         0.173 |            0.147 |            3 |               1 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Prevotellaceae     | Prevotella       | Prevotellamelaninogenica    |
+| 248140 |         0.173 |            0.076 |            3 |               3 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | Bacteroidescaccae           |
+| 171551 |         0.189 |            0.162 |            2 |               1 | Bacteria | Firmicutes     | Clostridia          | Clostridiales     | Ruminococcaceae    | Faecalibacterium | Faecalibacteriumprausnitzii |
+| 98605  |         0.189 |            0.116 |            2 |               2 | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus    | Streptococcussanguinis      |
+| 114821 |         0.189 |            0.089 |            2 |               3 | Bacteria | Firmicutes     | Clostridia          | Clostridiales     | Veillonellaceae    | Veillonella      | Veillonellaparvula          |
 
 ### `plot_nested_bar`
 
@@ -383,7 +239,7 @@ plot_nested_bar(top_nested$ps_obj,
                                "points"))
 ```
 
-![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
 
 #### Palette
 
@@ -407,7 +263,7 @@ plot_nested_bar(top_nested$ps_obj,
                 merged_clr = "black")
 ```
 
-![](man/figures/README-unnamed-chunk-14-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
 
 #### Sample order
 
@@ -443,7 +299,7 @@ plot_nested_bar(top_nested$ps_obj,
                 sample_order = sample_order)
 ```
 
-![](man/figures/README-unnamed-chunk-15-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-12-1.png)<!-- -->
 
 ## Advanced usage
 
@@ -529,7 +385,7 @@ p <- p + geom_col(position = position_fill())
 p
 ```
 
-![](man/figures/README-unnamed-chunk-16-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
 
 ### `taxon_colours`
 
@@ -563,7 +419,9 @@ plot_colours <- function(pal){
     scale_y_discrete(expand = c(0,0)) +
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_blank())
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5,
+                                    size = 12))
 }
 
 # Get top taxa and generate a palette
@@ -586,7 +444,7 @@ p3 <- plot_colours(pal3) +
 grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
-![](man/figures/README-unnamed-chunk-17-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-14-1.png)<!-- -->
 
 ### `name_na_taxa`
 
@@ -603,78 +461,46 @@ name was inferred in the new name. This can be turned off by setting
 ``` r
 # Fill in names for NA taxa, including their rank
 ps_tmp <- name_na_taxa(top_asv$ps_obj)
-tax_table(ps_tmp)
-#> Taxonomy Table:     [11 taxa by 7 taxonomic ranks]:
-#>        Kingdom    Phylum           Class                 Order              
-#> 549322 "Other"    "Other"          "Other"               "Other"            
-#> 329744 "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"  
-#> 317182 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 549656 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 279599 "Bacteria" "Cyanobacteria"  "Nostocophycideae"    "Nostocales"       
-#> 360229 "Bacteria" "Proteobacteria" "Betaproteobacteria"  "Neisseriales"     
-#> 94166  "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pasteurellales"   
-#> 550960 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Enterobacteriales"
-#> 158660 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 331820 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 98605  "Bacteria" "Firmicutes"     "Bacilli"             "Lactobacillales"  
-#>        Family                          Genus                          
-#> 549322 "Other"                         "Other"                        
-#> 329744 "ACK-M1"                        "Unknown ACK-M1 (Family)"      
-#> 317182 "Unknown Stramenopiles (Order)" "Unknown Stramenopiles (Order)"
-#> 549656 "Unknown Stramenopiles (Order)" "Unknown Stramenopiles (Order)"
-#> 279599 "Nostocaceae"                   "Dolichospermum"               
-#> 360229 "Neisseriaceae"                 "Neisseria"                    
-#> 94166  "Pasteurellaceae"               "Haemophilus"                  
-#> 550960 "Enterobacteriaceae"            "Providencia"                  
-#> 158660 "Bacteroidaceae"                "Bacteroides"                  
-#> 331820 "Bacteroidaceae"                "Bacteroides"                  
-#> 98605  "Streptococcaceae"              "Streptococcus"                
-#>        Species                         
-#> 549322 "Other"                         
-#> 329744 "Unknown ACK-M1 (Family)"       
-#> 317182 "Unknown Stramenopiles (Order)" 
-#> 549656 "Unknown Stramenopiles (Order)" 
-#> 279599 "Unknown Dolichospermum (Genus)"
-#> 360229 "Unknown Neisseria (Genus)"     
-#> 94166  "Haemophilusparainfluenzae"     
-#> 550960 "Unknown Providencia (Genus)"   
-#> 158660 "Unknown Bacteroides (Genus)"   
-#> 331820 "Unknown Bacteroides (Genus)"   
-#> 98605  "Streptococcussanguinis"
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
 ```
+
+|        | Kingdom  | Phylum         | Class               | Order             | Family                        | Genus                         | Species                        |
+|:-------|:---------|:---------------|:--------------------|:------------------|:------------------------------|:------------------------------|:-------------------------------|
+| 549322 | Other    | Other          | Other               | Other             | Other                         | Other                         | Other                          |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1                        | Unknown ACK-M1 (Family)       | Unknown ACK-M1 (Family)        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | Unknown Stramenopiles (Order) | Unknown Stramenopiles (Order) | Unknown Stramenopiles (Order)  |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | Unknown Stramenopiles (Order) | Unknown Stramenopiles (Order) | Unknown Stramenopiles (Order)  |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae                   | Dolichospermum                | Unknown Dolichospermum (Genus) |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae                 | Neisseria                     | Unknown Neisseria (Genus)      |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae               | Haemophilus                   | Haemophilusparainfluenzae      |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae            | Providencia                   | Unknown Providencia (Genus)    |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae                | Bacteroides                   | Unknown Bacteroides (Genus)    |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae                | Bacteroides                   | Unknown Bacteroides (Genus)    |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae              | Streptococcus                 | Streptococcussanguinis         |
 
 ``` r
 # Leave the rank out and alter the label
 ps_tmp <- name_na_taxa(top_asv$ps_obj, 
                        include_rank = F, 
                        na_label = "NA <tax>")
-tax_table(ps_tmp)
-#> Taxonomy Table:     [11 taxa by 7 taxonomic ranks]:
-#>        Kingdom    Phylum           Class                 Order              
-#> 549322 "Other"    "Other"          "Other"               "Other"            
-#> 329744 "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"  
-#> 317182 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 549656 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 279599 "Bacteria" "Cyanobacteria"  "Nostocophycideae"    "Nostocales"       
-#> 360229 "Bacteria" "Proteobacteria" "Betaproteobacteria"  "Neisseriales"     
-#> 94166  "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pasteurellales"   
-#> 550960 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Enterobacteriales"
-#> 158660 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 331820 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 98605  "Bacteria" "Firmicutes"     "Bacilli"             "Lactobacillales"  
-#>        Family               Genus              Species                    
-#> 549322 "Other"              "Other"            "Other"                    
-#> 329744 "ACK-M1"             "NA ACK-M1"        "NA ACK-M1"                
-#> 317182 "NA Stramenopiles"   "NA Stramenopiles" "NA Stramenopiles"         
-#> 549656 "NA Stramenopiles"   "NA Stramenopiles" "NA Stramenopiles"         
-#> 279599 "Nostocaceae"        "Dolichospermum"   "NA Dolichospermum"        
-#> 360229 "Neisseriaceae"      "Neisseria"        "NA Neisseria"             
-#> 94166  "Pasteurellaceae"    "Haemophilus"      "Haemophilusparainfluenzae"
-#> 550960 "Enterobacteriaceae" "Providencia"      "NA Providencia"           
-#> 158660 "Bacteroidaceae"     "Bacteroides"      "NA Bacteroides"           
-#> 331820 "Bacteroidaceae"     "Bacteroides"      "NA Bacteroides"           
-#> 98605  "Streptococcaceae"   "Streptococcus"    "Streptococcussanguinis"
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
 ```
+
+|        | Kingdom  | Phylum         | Class               | Order             | Family             | Genus            | Species                   |
+|:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:-----------------|:--------------------------|
+| 549322 | Other    | Other          | Other               | Other             | Other              | Other            | Other                     |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA ACK-M1        | NA ACK-M1                 |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA Stramenopiles   | NA Stramenopiles | NA Stramenopiles          |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA Stramenopiles   | NA Stramenopiles | NA Stramenopiles          |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum   | NA Dolichospermum         |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria        | NA Neisseria              |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus      | Haemophilusparainfluenzae |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia      | NA Providencia            |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | NA Bacteroides            |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | NA Bacteroides            |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus    | Streptococcussanguinis    |
 
 ### `label_duplicate_taxa`
 
@@ -724,77 +550,45 @@ tax_table(ps_tmp)
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
                                asv_as_id = T, 
                                duplicate_label = "<tax> ASV <id>")
-tax_table(ps_tmp)
-#> Taxonomy Table:     [11 taxa by 7 taxonomic ranks]:
-#>        Kingdom    Phylum           Class                
-#> 549322 "Other"    "Other"          "Other"              
-#> 329744 "Bacteria" "Actinobacteria" "Actinobacteria"     
-#> 317182 "Bacteria" "Cyanobacteria"  "Chloroplast"        
-#> 549656 "Bacteria" "Cyanobacteria"  "Chloroplast"        
-#> 279599 "Bacteria" "Cyanobacteria"  "Nostocophycideae"   
-#> 360229 "Bacteria" "Proteobacteria" "Betaproteobacteria" 
-#> 94166  "Bacteria" "Proteobacteria" "Gammaproteobacteria"
-#> 550960 "Bacteria" "Proteobacteria" "Gammaproteobacteria"
-#> 158660 "Bacteria" "Bacteroidetes"  "Bacteroidia"        
-#> 331820 "Bacteria" "Bacteroidetes"  "Bacteroidia"        
-#> 98605  "Bacteria" "Firmicutes"     "Bacilli"            
-#>        Order                      Family               Genus                   
-#> 549322 "Other"                    "Other"              "Other"                 
-#> 329744 "Actinomycetales"          "ACK-M1"             NA                      
-#> 317182 "Stramenopiles ASV 317182" NA                   NA                      
-#> 549656 "Stramenopiles ASV 549656" NA                   NA                      
-#> 279599 "Nostocales"               "Nostocaceae"        "Dolichospermum"        
-#> 360229 "Neisseriales"             "Neisseriaceae"      "Neisseria"             
-#> 94166  "Pasteurellales"           "Pasteurellaceae"    "Haemophilus"           
-#> 550960 "Enterobacteriales"        "Enterobacteriaceae" "Providencia"           
-#> 158660 "Bacteroidales"            "Bacteroidaceae"     "Bacteroides ASV 158660"
-#> 331820 "Bacteroidales"            "Bacteroidaceae"     "Bacteroides ASV 331820"
-#> 98605  "Lactobacillales"          "Streptococcaceae"   "Streptococcus"         
-#>        Species                    
-#> 549322 "Other"                    
-#> 329744 NA                         
-#> 317182 NA                         
-#> 549656 NA                         
-#> 279599 NA                         
-#> 360229 NA                         
-#> 94166  "Haemophilusparainfluenzae"
-#> 550960 NA                         
-#> 158660 NA                         
-#> 331820 NA                         
-#> 98605  "Streptococcussanguinis"
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
 ```
+
+|        | Kingdom  | Phylum         | Class               | Order                    | Family             | Genus                  | Species                   |
+|:-------|:---------|:---------------|:--------------------|:-------------------------|:-------------------|:-----------------------|:--------------------------|
+| 549322 | Other    | Other          | Other               | Other                    | Other              | Other                  | Other                     |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales          | ACK-M1             | NA                     | NA                        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles ASV 317182 | NA                 | NA                     | NA                        |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles ASV 549656 | NA                 | NA                     | NA                        |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales               | Nostocaceae        | Dolichospermum         | NA                        |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales             | Neisseriaceae      | Neisseria              | NA                        |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales           | Pasteurellaceae    | Haemophilus            | Haemophilusparainfluenzae |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales        | Enterobacteriaceae | Providencia            | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales            | Bacteroidaceae     | Bacteroides ASV 158660 | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales            | Bacteroidaceae     | Bacteroides ASV 331820 | NA                        |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales          | Streptococcaceae   | Streptococcus          | Streptococcussanguinis    |
 
 ``` r
 # Label at Genus level
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
                                tax_level = "Genus")
-tax_table(ps_tmp)
-#> Taxonomy Table:     [11 taxa by 7 taxonomic ranks]:
-#>        Kingdom    Phylum           Class                 Order              
-#> 549322 "Other"    "Other"          "Other"               "Other"            
-#> 329744 "Bacteria" "Actinobacteria" "Actinobacteria"      "Actinomycetales"  
-#> 317182 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 549656 "Bacteria" "Cyanobacteria"  "Chloroplast"         "Stramenopiles"    
-#> 279599 "Bacteria" "Cyanobacteria"  "Nostocophycideae"    "Nostocales"       
-#> 360229 "Bacteria" "Proteobacteria" "Betaproteobacteria"  "Neisseriales"     
-#> 94166  "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Pasteurellales"   
-#> 550960 "Bacteria" "Proteobacteria" "Gammaproteobacteria" "Enterobacteriales"
-#> 158660 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 331820 "Bacteria" "Bacteroidetes"  "Bacteroidia"         "Bacteroidales"    
-#> 98605  "Bacteria" "Firmicutes"     "Bacilli"             "Lactobacillales"  
-#>        Family               Genus            Species                    
-#> 549322 "Other"              "Other"          "Other"                    
-#> 329744 "ACK-M1"             NA               NA                         
-#> 317182 NA                   NA               NA                         
-#> 549656 NA                   NA               NA                         
-#> 279599 "Nostocaceae"        "Dolichospermum" NA                         
-#> 360229 "Neisseriaceae"      "Neisseria"      NA                         
-#> 94166  "Pasteurellaceae"    "Haemophilus"    "Haemophilusparainfluenzae"
-#> 550960 "Enterobacteriaceae" "Providencia"    NA                         
-#> 158660 "Bacteroidaceae"     "Bacteroides 1"  NA                         
-#> 331820 "Bacteroidaceae"     "Bacteroides 2"  NA                         
-#> 98605  "Streptococcaceae"   "Streptococcus"  "Streptococcussanguinis"
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
 ```
+
+|        | Kingdom  | Phylum         | Class               | Order             | Family             | Genus          | Species                   |
+|:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:---------------|:--------------------------|
+| 549322 | Other    | Other          | Other               | Other             | Other              | Other          | Other                     |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA             | NA                        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum | NA                        |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 1  | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 2  | NA                        |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
 
 ### `move_label` & `move_nested_labels`
 
@@ -830,8 +624,6 @@ which it will be moved to the desired nested position. Here we flip the
 order of the two `Unknown Bacteroides`.
 
 ``` r
-print("Original order")
-#> [1] "Original order"
 levels(as.factor(psdf$Species))
 #>  [1] "Haemophilusparainfluenzae"       "Other"                          
 #>  [3] "Streptococcussanguinis"          "Unknown ACK-M1 (Family)"        
@@ -845,8 +637,6 @@ psdf <- move_nested_labels(psdf,
                            top_merged_label = "Other",
                            nested_label = "Unknown Bacteroides 1",
                            pos = Inf)
-print("Final order")
-#> [1] "Final order"
 levels(psdf$Species)
 #>  [1] "Unknown ACK-M1 (Family)"         "Unknown Bacteroides 2 (Genus)"  
 #>  [3] "Unknown Bacteroides 1 (Genus)"   "Unknown Dolichospermum (Genus)" 
@@ -880,11 +670,14 @@ p <- p + geom_col(position = position_fill(), width = 0.5)
 p
 ```
 
-![](man/figures/README-unnamed-chunk-25-1.png)<!-- --> #### Alternative
-plot types By using `ggnested` directly rather than using
-`plot_nested_bar`, any type of plot can be created that is available
-through `ggplot2`. For example, you could create a boxplot that is
-grouped and coloured by phylum, and shaded by species:
+![](man/figures/README-unnamed-chunk-22-1.png)<!-- -->
+
+#### Alternative plot types
+
+By using `ggnested` directly rather than using `plot_nested_bar`, any
+type of plot can be created that is available through `ggplot2`. For
+example, you could create a boxplot that is grouped and coloured by
+phylum, and shaded by species:
 
 ``` r
 # Create a boxplot instead of a barplot
@@ -907,7 +700,7 @@ p <- ggnested(psdf_rel,
 p + geom_boxplot(alpha = 0.5)
 ```
 
-![](man/figures/README-unnamed-chunk-26-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-23-1.png)<!-- -->
 
 ## What happened to `fantaxtic_bar`?
 
@@ -923,4 +716,4 @@ ps_tmp <- name_taxa(ps_tmp, label = "Unkown", species = T, other_label = "Other"
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
 ```
 
-![](man/figures/README-unnamed-chunk-27-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-24-1.png)<!-- -->
