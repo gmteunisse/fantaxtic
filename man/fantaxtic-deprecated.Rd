@@ -8,6 +8,8 @@
 \alias{gen_colors}
 \alias{shuffle_colors}
 \alias{gen_shades_tints}
+\alias{gen_uniq_lbls}
+\alias{name_taxa}
 \title{Deprecated functions in package \pkg{fantaxtic}.}
 \usage{
 get_top_taxa(
@@ -43,6 +45,17 @@ gen_colors(n, clr = "#6495ed")
 shuffle_colors(clrs)
 
 gen_shades_tints(i, clr = "#6495ed")
+
+gen_uniq_lbls(lbls, sep_char = " ")
+
+name_taxa(
+  physeq_obj,
+  label = "Unannotated",
+  other_label = NULL,
+  species = FALSE,
+  unique_rank = NULL,
+  unique_sep = " "
+)
 }
 \description{
 The functions listed below are deprecated and will be defunct in
@@ -62,7 +75,7 @@ For \code{gen_palette}, use \code{\link[ggnested]{nested_palette}} in the ggnest
 
 \section{fantaxtic_bar}{
 
-For \code{fantaxtic_bar}, use \code{\link{fantaxtic}}.
+For \code{fantaxtic_bar}, use \code{\link{plot_nested_bar}}.
 }
 
 \section{gen_colors}{
@@ -78,6 +91,16 @@ For \code{shuffle_colors}, use \code{\link[ggnested]{nested_palette}} in the ggn
 \section{gen_shades_tints}{
 
 For \code{gen_shades_tints}, use \code{\link[ggnested]{nested_palette}} in the ggnested package.
+}
+
+\section{gen_uniq_lbls}{
+
+For \code{gen_uniq_lbls}, use \code{\link{name_na_taxa}} or \code{\link{label_duplicate_taxa}}.
+}
+
+\section{name_taxa}{
+
+For \code{name_taxa}, use \code{\link{name_na_taxa}} or \code{\link{label_duplicate_taxa}}.
 }
 
 \keyword{internal}

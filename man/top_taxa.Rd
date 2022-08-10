@@ -6,9 +6,12 @@
 \usage{
 top_taxa(
   ps_obj,
+  tax_level = NULL,
   n_taxa = 1,
   grouping = NULL,
   by_proportion = TRUE,
+  include_na_taxa = F,
+  merged_label = "Other",
   FUN = mean,
   ...
 )
@@ -17,13 +20,19 @@ top_taxa(
 \item{ps_obj}{A phyloseq object with an \code{otu_table} and a
 \code{tax_table}.}
 
+\item{tax_level}{Optional taxonomic level at which to get the top taxa.}
+
 \item{n_taxa}{The number of top taxa to identify.}
 
 \item{grouping}{A character vector with the names of one or more grouping
-factors found in the \code{tax_table}. To group by sample, specify \code{sample_id}.}
+factors found in the \code{sample_data}. To group by sample, specify \code{sample_id}.}
 
 \item{by_proportion}{Converts absolute abundances to proportions before
 calculating the summary statistic (default = \code{TRUE}).}
+
+\item{include_na_taxa}{When \code{tax_level} is specified, include NA taxa? See details.}
+
+\item{merged_label}{The label to assign to merged taxa}
 
 \item{FUN}{Function that returns a single summary statistic from an input vector,
 e.g. \code{sum}, \code{mean} (default) or \code{median}}
@@ -39,33 +48,51 @@ This function identifies the top \eqn{n} taxa in a phyloseq object. Users specif
 summary statistic that is used to rank the taxa, e.g. \code{sum}, \code{mean} or
 \code{median}. Furthermore, it is possible to add one or more grouping
 factors from the \code{tax_table} to get group-specific top \eqn{n} taxa.
-The top taxa can be identified based on the absolute abundances or proportions.
 }
 \details{
+When \code{tax_level = NULL}, the analysis will be done at the ASV level. If a
+\code{tax_level} is specified, the object will first be glommed using
+\code{tax_glom(ps_obj, tax_rank = tax_level, NArm = F)} at the specified level.
+This can lead to taxa with NA annotations at the specified \code{tax_level}. By default,
+these taxa will not be considered for the analysis, but they can be included
+by setting \code{include_na_taxa = T}.
+
 This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
 \code{\link[fantaxtic]{get_top_taxa}}. Identical output can be obtained  by setting
 \code{FUN = sum}.
+
+The top taxa can be identified based on the absolute abundances or proportions.
+When using absolute abundances, please make sure to normalize or rarefy the data
+before using this function. If \code{by_proportion = TRUE}, abundances will
+be converted to relative abundance before applying \code{FUN}.
 }
 \examples{
 data(GlobalPatterns)
 
 # Top 10 most abundant ASVs over all samples
-top_taxa(GlobalPatterns, 10)
+top_taxa(GlobalPatterns, n_taxa = 10)
 
 # Top 10 most abundant ASVs over all samples by median abundance
-top_taxa(GlobalPatterns, 10, FUN = median, na.rm = T)
+top_taxa(GlobalPatterns, n_taxa = 10, FUN = median, na.rm = T)
 
 # Top 10 most abundant ASVs over all samples using absolute abundances
-top_taxa(GlobalPatterns, 10, by_proportion = FALSE)
+top_taxa(GlobalPatterns, n_taxa = 10, by_proportion = FALSE)
 
 # Top 2 most abundant ASVs per sample
-top_taxa(GlobalPatterns, 2, grouping = "sample_id")
+top_taxa(GlobalPatterns, n_taxa = 2, grouping = "sample_id")
 
 # Top 2 most abundant ASVs per sample type
-top_taxa(GlobalPatterns, 2, grouping = "SampleType")
+top_taxa(GlobalPatterns, n_taxa = 2, grouping = "SampleType")
 
 # Top 2 most abundant ASVs per sample type and group
 set.seed(1)
 sample_data(GlobalPatterns)$group <- as.factor(rbinom(nsamples(GlobalPatterns), 1, .5))
-top_taxa(GlobalPatterns, 2, grouping = c("SampleType", "group"))
+top_taxa(GlobalPatterns, n_taxa = 2, grouping = c("SampleType", "group"))
+
+# Top 20 most abundant genera
+top_taxa(GlobalPatterns, n_taxa = 20, tax_level = "Genus")
+
+#' # Top 20 most abundant genera including NAs
+top_taxa(GlobalPatterns, n_taxa = 20, tax_level = "Genus", include_na_taxa = T)
+
 }

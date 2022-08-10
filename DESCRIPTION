@@ -1,29 +1,35 @@
 Package: fantaxtic
 Type: Package
-Title: Fantaxtic Plots from Phyloseq Data
-Version: 0.1.0
+Title: Fantaxtic - nested bar plots for phyloseq data
+Version: 0.2.0
 Author: person("Guus Martijn", "Teunisse", email = "gmteunisse@gmail.com",
     role = c("aut", "cre"))
-Description: This package is a set of wrapper functions for phyloseq and
-    ggplot2 that turns ordinary taxonomic count data into fantaxtic,
-    publication ready plots. Fantaxticfigures come as completely stylized 
-    figures with pleasing colors and maximal plotting control. As the output 
-    figures are simply ggplot2 objects, expert users can also manipulate the 
-    final output to customize figures up to their desire.
+Maintainer: Guus Martijn Teunisse <gmteunisse@gmail.com>
+Description: This package contains a set of functions to identify and visualize
+    the most abundant taxa in Phyloseq objects. It allows users to identify top
+    taxa using any function and any desired grouping, and plot the (relative) 
+    abundances of the top taxa using a nested bar plot visualisation, in which
+    colours / fills signify a top taxonomic rank (e.g. Phylum), and shades / tints signify a 
+    nested taxonomic rank (e.g. Species).
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4.4), 
+Imports: 
     stats, 
     grDevices,
     ggplot2,
     phyloseq,
     reshape2,
     dplyr,
-    magrittr,
     tidyr,
-    ggnested
+    stringr,
+    forcats,
+    ggnested,
+    magrittr
+Remotes:
+  github::gmteunisse/ggnested
 RoxygenNote: 7.2.0
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    DT
 VignetteBuilder: knitr
