@@ -20,7 +20,7 @@ useful. Thus, the output is `ggplot2` object, and can be manipulated as
 such.
 
 **Keywords: nested bar plot, phyloseq, taxonomy, most abundant taxa,
-multiple levels, shades, tins, gradient, 16S, ITS ,18S, microbiome,
+multiple levels, shades, tints, gradient, 16S, ITS ,18S, microbiome,
 amplicon sequencing, metabarcoding**
 
 ## Installation

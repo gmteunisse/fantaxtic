@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 Note that `fantaxtic` is essentially a wrapper around [`ggnested`](https://github.com/gmteunisse/ggnested), with some accessory functions to identify top taxa and to ensure that the plot is useful. Thus, the output is `ggplot2` object, and can be manipulated as such.
 
 
-**Keywords: nested bar plot, phyloseq, taxonomy, most abundant taxa, multiple levels, shades, tins, gradient, 16S, ITS ,18S, microbiome, amplicon sequencing, metabarcoding**
+**Keywords: nested bar plot, phyloseq, taxonomy, most abundant taxa, multiple levels, shades, tints, gradient, 16S, ITS ,18S, microbiome, amplicon sequencing, metabarcoding**
 
 ## Installation
 ```{r, eval = FALSE}
