@@ -1,5 +1,5 @@
 
-#' Get the most abundant taxa over two nested levels
+#' Get the most abundant taxa over two taxonomic levels
 #'
 #' This function identifies the top \eqn{n} named taxa and the top \eqn{m} named taxa at a
 #' nested level in a phyloseq object. Users specify the
@@ -10,8 +10,8 @@
 #' @details
 #' This function first finds the top \eqn{n} named taxa at the top level, after
 #' which it merges all other top_taxa level into a single taxon with the
-#' \code{merged_label} annotation. Next, loops through each remaining top level taxon,
-#' and identifies the top  \eqn{m} named taxa at the nested level. If
+#' \code{merged_label} annotation. Next, it loops through each remaining top level taxon,
+#' and identifies the top \eqn{m} named taxa at the nested level. If
 #' \eqn{\le m} taxa are available, it will only return those taxa. If more are
 #' available, it will merge all non-top-taxa into a single taxon with the
 #' \code{merged_label} annotation, together with its top level annotation.
@@ -36,10 +36,11 @@
 #' @param n_top_taxa The number of top taxa to identify at the top level.
 #' @param n_nested_taxa The number of top taxa to identify at the nested level.
 #' For ASVs, specify "ASV"
+#' @param top_merged_label Label to assign to the merged top_tax_level taxa
+#' @param nested_merged_label Label to assign to the merged nested_tax_level taxa
 #' @param by_proportion Converts absolute abundances to proportions before
 #' calculating the summary statistic (default = \code{TRUE}).
-#' @param merged_label Prefix that will be added after merging non-top taxa.
-#' @param ... Additional arguments to be passed \code{top_taxa}
+#' @param ... Additional arguments to be passed \code{\link{top_taxa}}
 #' (e.g. \code{grouping = <string>, FUN = mean, na.rm = TRUE},).
 #' @return A list in which \code{top_taxa} is a tibble with the rank, taxon id, grouping
 #' factors, abundance summary statistic and taxonomy of the top taxa and \code{ps_obj}
@@ -52,20 +53,22 @@
 #' # Top 3 most abundant orders, top 3 most abundant families over all samples,
 #' # using the mean as the aggregation function
 #' nested_top_taxa(GlobalPatterns, top_tax_level = "Order", nested_tax_level
-#' = "Family", n_top_taxa = 3, n_nested_taxa = 3, merged_label = "Other",
+#' = "Family", n_top_taxa = 3, n_nested_taxa = 3,
 #' FUN = mean, na.rm = T)
 #'
-#' #' # Top 3 most abundant genera, top 3 most abundant species over all samples,
-#' # using the mean as the aggregation function
+#' #' # Top 1 most abundant genera, top 2 most abundant species per SampleType,
+#' # using the median as the aggregation function
 #' nested_top_taxa(GlobalPatterns, top_tax_level = "Genus", nested_tax_level
-#' = "Species", n_top_taxa = 3, n_nested_taxa = 3, merged_label = "Other",
-#' FUN = mean, na.rm = T)
+#' = "Species", n_top_taxa = 1, n_nested_taxa = 2, grouping = "SampleType",
+#' FUN = median)
 #' @export
-nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
-                            n_top_taxa = 1, n_nested_taxa = 1,
+nested_top_taxa <- function(ps_obj,
+                            top_tax_level,
+                            nested_tax_level,
+                            n_top_taxa = 1,
+                            n_nested_taxa = 1,
                             top_merged_label = "Other",
-                            nested_merged_label = "Other",
-                            include_nested_tax = TRUE,
+                            nested_merged_label = "Other <tax>",
                             by_proportion = T,
                             ...){
 
@@ -94,6 +97,9 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     msg <- sprintf("Error: top_tax_level needs to be a higher taxonomic rank than nested_tax_level.
                     Tax ranks in this object are %s", paste(tax_ranks, collapse = ", "))
     stop(msg)
+  }
+  if(!grepl("<tax>", nested_merged_label)){
+    stop("Error: nested merged label must include <tax>")
   }
 
   # Make sure taxa are rows
@@ -147,6 +153,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
   # Loop through each top_tax_level and get the top n nested_tax_level taxa
   lvls <- unique(taxa[,top_tax_level])
   top_nest <- list()
+  merged_ids <- c()
   for (lvl in lvls){
 
     # Get the taxids of all nested_taxa within the current top_level taxon.
@@ -185,6 +192,7 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     to_merge <- c(to_merge, na_taxids)
     ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge, 1) %>%
       suppressWarnings()
+    merged_ids <- c(merged_ids, to_merge[1])
   }
 
   # Combine the results
@@ -203,22 +211,10 @@ nested_top_taxa <- function(ps_obj, top_tax_level, nested_tax_level,
     suppressMessages()
 
   # Update the taxon name to nested_merged_label
-  if (include_nested_tax){
-    tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
-      data.frame() %>%
-      mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
-                                          paste(nested_merged_label, !!sym(top_tax_level)),
-                                          !!sym(nested_tax_level))
-      ) %>%
-      as.matrix()
-  } else {
-    tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
-      data.frame() %>%
-      mutate(!!nested_tax_level := ifelse(is.na(!!sym(nested_tax_level)),
-                                          nested_merged_label,
-                                          !!sym(nested_tax_level))
-      ) %>%
-      as.matrix()
+  tax_tbl <- phyloseq::tax_table(ps_obj_nest)
+  for (i in merged_ids){
+    lab <- gsub("<tax>", tax_tbl[i,top_tax_level], nested_merged_label)
+    tax_tbl[i, is.na(tax_tbl[i,])] <- lab
   }
   phyloseq::tax_table(ps_obj_nest) <- tax_tbl
 

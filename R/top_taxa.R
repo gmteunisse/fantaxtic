@@ -6,6 +6,13 @@
 #' factors from the \code{tax_table} to get group-specific top \eqn{n} taxa.
 #'
 #' @details
+#' When \code{tax_level = NULL}, the analysis will be done at the ASV level. If a
+#' \code{tax_level} is specified, the object will first be glommed using
+#' \code{tax_glom(ps_obj, tax_rank = tax_level, NArm = F)} at the specified level.
+#' This can lead to taxa with NA annotations at the specified \code{tax_level}. By default,
+#' these taxa will not be considered for the analysis, but they can be included
+#' by setting \code{include_na_taxa = T}.
+#'
 #' This function, together with \code{\link[fantaxtic]{collapse_taxa}}, replaces
 #' \code{\link[fantaxtic]{get_top_taxa}}. Identical output can be obtained  by setting
 #' \code{FUN = sum}.
@@ -17,11 +24,14 @@
 #'
 #' @param ps_obj A phyloseq object with an \code{otu_table} and a
 #' \code{tax_table}.
+#' @param tax_level Optional taxonomic level at which to get the top taxa.
 #' @param n_taxa The number of top taxa to identify.
 #' @param grouping A character vector with the names of one or more grouping
 #' factors found in the \code{sample_data}. To group by sample, specify \code{sample_id}.
 #' @param by_proportion Converts absolute abundances to proportions before
 #' calculating the summary statistic (default = \code{TRUE}).
+#' @param include_na_taxa When \code{tax_level} is specified, include NA taxa? See details.
+#' @param merged_label The label to assign to merged taxa
 #' @param FUN Function that returns a single summary statistic from an input vector,
 #' e.g. \code{sum}, \code{mean} (default) or \code{median}
 #' @param ... Additional arguments to be passed to \code{FUN}.
@@ -33,28 +43,31 @@
 #' data(GlobalPatterns)
 #'
 #' # Top 10 most abundant ASVs over all samples
-#' top_taxa(GlobalPatterns, 10)
+#' top_taxa(GlobalPatterns, n_taxa = 10)
 #'
 #' # Top 10 most abundant ASVs over all samples by median abundance
-#' top_taxa(GlobalPatterns, 10, FUN = median, na.rm = T)
+#' top_taxa(GlobalPatterns, n_taxa = 10, FUN = median, na.rm = T)
 #'
 #' # Top 10 most abundant ASVs over all samples using absolute abundances
-#' top_taxa(GlobalPatterns, 10, by_proportion = FALSE)
+#' top_taxa(GlobalPatterns, n_taxa = 10, by_proportion = FALSE)
 #'
 #' # Top 2 most abundant ASVs per sample
-#' top_taxa(GlobalPatterns, 2, grouping = "sample_id")
+#' top_taxa(GlobalPatterns, n_taxa = 2, grouping = "sample_id")
 #'
 #' # Top 2 most abundant ASVs per sample type
-#' top_taxa(GlobalPatterns, 2, grouping = "SampleType")
+#' top_taxa(GlobalPatterns, n_taxa = 2, grouping = "SampleType")
 #'
 #' # Top 2 most abundant ASVs per sample type and group
 #' set.seed(1)
 #' sample_data(GlobalPatterns)$group <- as.factor(rbinom(nsamples(GlobalPatterns), 1, .5))
-#' top_taxa(GlobalPatterns, 2, grouping = c("SampleType", "group"))
+#' top_taxa(GlobalPatterns, n_taxa = 2, grouping = c("SampleType", "group"))
 #'
-#' # Top 2 most abundant genera per sample type
-#' ps_genus <- tax_glom(GlobalPatterns, taxrank = "Genus")
-#' top_taxa(ps_genus, 2)
+#' # Top 20 most abundant genera
+#' top_taxa(GlobalPatterns, n_taxa = 20, tax_level = "Genus")
+#'
+#' #' # Top 20 most abundant genera including NAs
+#' top_taxa(GlobalPatterns, n_taxa = 20, tax_level = "Genus", include_na_taxa = T)
+#'
 #' @export
 top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
                      by_proportion = TRUE, include_na_taxa = F, merged_label = "Other",
@@ -77,15 +90,6 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
     }
   }
 
-  #Check for empty samples
-  smpl_sms <- phyloseq::sample_sums(ps_obj)
-  if (0 %in% smpl_sms){
-    msg <- sprintf("Warning: some samples contain 0 reads. The following samples have been removed from the analysis:\n%s",
-                   paste(names(smpl_sms)[smpl_sms == 0], collapse = "\n"))
-    warning(msg)
-    ps_obj <- phyloseq::subset_samples(ps_obj, smpl_sms > 0)
-  }
-
   # Check the grouping
   if(!is.null(grouping)){
 
@@ -98,7 +102,7 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
     }
   }
 
-  # Gom and merge taxa when tax_level is specified
+  # Glom and merge taxa when tax_level is specified
   merged_taxid <- NULL
   if(!is.null(tax_level)){
     if(tax_level != "ASV"){

@@ -1,4 +1,3 @@
-
 #' Subset a phyloseq object to a set of taxa.
 #'
 #' This function takes a phyloseq object and a list of taxon ids to be kept,
@@ -24,19 +23,22 @@
 #' @examples
 #' data(GlobalPatterns)
 #'
-#' # Top 10 most abundant ASVs over all samples, collapse other ASVs into 'Other'
+#' # Top 10 most abundant ASVs over all samples, collapse other ASVs into 'Low abundance'
 #' top <- top_taxa(GlobalPatterns, 10)
-#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid)
+#' ps_collapsed <- collapse_taxa(GlobalPatterns,
+#'                               taxa_to_keep = top$top_taxa$taxid,
+#'                               merged_label = "Low abundance")
 #'
 #' # Top 10 most abundant ASVs over all samples, discard other taxa
 #' top <- top_taxa(GlobalPatterns, 10)
 #' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid,
 #'                               discard_other = TRUE)
 #'
-#' # Top 10 most abundant ASVs over all samples, collapse other ASVs into 'Low abundance'
-#' top <- top_taxa(GlobalPatterns, 10)
-#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = top$taxid,
-#'                               collapsed_label = "Low abundance")
+#' # Keep genus Clostridium, collapse all others into Other genera
+#' ps_tmp <- subset_taxa(GlobalPatterns, Genus == "Clostridium")
+#' taxids <- taxa_names(ps_tmp)
+#' ps_collapsed <- collapse_taxa(GlobalPatterns, taxa_to_keep = taxids,
+#'                               merged_label = "Other genera")
 #'
 #' @export
 collapse_taxa <- function(ps_obj, taxa_to_keep, discard_other = FALSE, merged_label = "Other"){
