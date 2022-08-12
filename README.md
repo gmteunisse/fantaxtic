@@ -44,6 +44,16 @@ and plot the top 10 most abundant ASVs by their mean relative abundance,
 using Phylum as the top rank and Species as the nested rank, run:
 
 ``` r
+require("fantaxtic")
+require("phyloseq")
+require("tidyverse")
+require("magrittr")
+require("ggnested")
+require("knitr")
+require("gridExtra")
+```
+
+``` r
 data(GlobalPatterns)
 top_asv <- top_taxa(GlobalPatterns, n_taxa = 10)
 plot_nested_bar(ps_obj = top_asv$ps_obj,

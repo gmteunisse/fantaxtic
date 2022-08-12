@@ -36,7 +36,7 @@ The \code{fantaxtic} workflow consists of two parts:
 
 For basic usage, only a few lines of R code are required. To identify and plot the top 10 most abundant ASVs by their mean relative abundance, using Phylum as the top rank and Species as the nested rank, run:
 
-```{r, include = F}
+```{r, echo = T, results = 'hide'}
 require("fantaxtic")
 require("phyloseq")
 require("tidyverse")
