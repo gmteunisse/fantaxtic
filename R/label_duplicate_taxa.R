@@ -33,7 +33,7 @@
 #' ps_tmp <- label_duplicate_taxa(GlobalPatterns, tax_level = "Species")
 #' View(tax_table(ps_tmp))
 #' @export
-label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = F,
+label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = T,
                                  duplicate_label = "<tax> <id>"){
 
   # Check arguments
@@ -47,14 +47,17 @@ label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = F,
 
   # Find duplicate taxa and flag for labeling
   tax_tab <- tax_table(ps_obj) %>%
-    data.frame(row_name = row.names(.)) %>%
-    group_by(across(-row_name)) %>%
-    mutate(n = row_number(),
-           dupl = n > 1) %>%
-    mutate(add_label = sum(dupl) > 0)
+    data.frame(row_name = row.names(.))
 
   # Add label to the lowest non-NA taxonomic level
   if(is.null(tax_level)){
+
+    # Find duplicates
+    tax_tab <- tax_tab %>%
+      group_by(across(-row_name)) %>%
+      mutate(n = row_number(),
+             dupl = n > 1) %>%
+      mutate(add_label = sum(dupl) > 0)
 
     # Convert to long
     tax_tab <- tax_tab %>%
@@ -71,7 +74,7 @@ label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = F,
                             tax),
              tax = str_replace(label, "<tax>", tax))
 
-    # Fill in id field
+    # Fill in id field with either the row number or the ASV ID (row_name)
     if(asv_as_id){
       tax_tab <- tax_tab %>%
         mutate(tax = str_replace(tax, "<id>", as.character(row_name)))
@@ -86,8 +89,15 @@ label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = F,
       select(!c(n, dupl, add_label, label)) %>%
       pivot_wider(names_from = rank, values_from = tax)
 
-  # Add a label to a specific taxonomic rank
+    # Add a label to a specific taxonomic rank
   } else {
+
+    # Find duplicates
+    tax_tab <- tax_tab %>%
+      group_by(!!sym(tax_level)) %>%
+      mutate(n = row_number(),
+             dupl = n > 1) %>%
+      mutate(add_label = sum(dupl) > 0)
 
     # Add label and fill in tax field
     tax_tab <- tax_tab %>%
@@ -117,8 +127,6 @@ label_duplicate_taxa <- function(ps_obj, tax_level = NULL, asv_as_id = F,
   tax_table(ps_obj) <- tax_mat
 
   return(ps_obj)
-
-
 
 
 }

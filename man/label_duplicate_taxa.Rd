@@ -7,7 +7,7 @@
 label_duplicate_taxa(
   ps_obj,
   tax_level = NULL,
-  asv_as_id = F,
+  asv_as_id = T,
   duplicate_label = "<tax> <id>"
 )
 }
