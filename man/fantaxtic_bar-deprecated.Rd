@@ -92,7 +92,7 @@ ps_tmp <- name_taxa(ps_tmp, label = "Unkown", species = T, other_label = "Other"
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
 
 #Generate a barplot that is colored by Phylum and lebeled by Species. As multiple
-ASVs have the same family annotation, generate unique labels.
+# ASVs have the same family annotation, generate unique labels.
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
               gen_uniq_lbls = TRUE)
 

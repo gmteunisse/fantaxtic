@@ -81,11 +81,10 @@ plot_nested_bar(ps_obj = top_nested$ps_obj,
 
 ### `top_taxa`
 
-This function identifies the top
-![n](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;n "n")
-taxa by some metric (e.g. mean, median, variance, etc.) in a phyloseq
-object. It outputs a table with the top taxa, as well as a phyloseq
-object in which all other taxa have been merged into a single taxon.
+This function identifies the top *n* taxa by some metric (e.g. mean,
+median, variance, etc.) in a phyloseq object. It outputs a table with
+the top taxa, as well as a phyloseq object in which all other taxa have
+been merged into a single taxon.
 
 #### Taxonomic rank
 
@@ -123,11 +122,10 @@ top_species$top_taxa %>%
 #### Grouping
 
 Furthermore, if one or more grouping factors are specified in
-`grouping`, it will calculate the top
-![n](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;n "n")
-taxa using the samples in each group, rather than using all samples in
-the phyloseq object. This makes it possible to for example identify the
-top taxa in each sample, or the top taxa in each treatment group.
+`grouping`, it will calculate the top *n* taxa using the samples in each
+group, rather than using all samples in the phyloseq object. This makes
+it possible to for example identify the top taxa in each sample, or the
+top taxa in each treatment group.
 
 ``` r
 top_grouped <- top_taxa(GlobalPatterns,
@@ -182,19 +180,17 @@ top_max$top_taxa %>%
 
 ### `nested_top_taxa`
 
-This function identifies the top
-![n](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;n "n")
-taxa at a taxonomic rank (e.g. Phylum) and the top
-![m](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;m "m")
-nested taxa at a lower taxonomic rank (e.g. Species) by some metric
-(e.g. mean, median, variance, etc.) in a phyloseq object. Internally, it
-makes use of `top_taxa`, and therefore uses many of the same options.
-Like `top_taxa`, it agglomerates taxa at the specified taxonomic ranks
-before identifying the top taxa. It outputs a table with the top taxa,
-as well as a phyloseq object in which all non-top taxa have been merged,
-both at the `top_tax_level` and at the `nested_tax_level`. This function
-is especially nice for providing overviews of your data, as it shows the
-relative abundance of each select `top_tax_level` taxon.
+This function identifies the top *n* taxa at a taxonomic rank
+(e.g. Phylum) and the top *m* nested taxa at a lower taxonomic rank
+(e.g. Species) by some metric (e.g. mean, median, variance, etc.) in a
+phyloseq object. Internally, it makes use of `top_taxa`, and therefore
+uses many of the same options. Like `top_taxa`, it agglomerates taxa at
+the specified taxonomic ranks before identifying the top taxa. It
+outputs a table with the top taxa, as well as a phyloseq object in which
+all non-top taxa have been merged, both at the `top_tax_level` and at
+the `nested_tax_level`. This function is especially nice for providing
+overviews of your data, as it shows the relative abundance of each
+select `top_tax_level` taxon.
 
 ``` r
 top_nested <- nested_top_taxa(GlobalPatterns,
@@ -512,13 +508,12 @@ For some studies, it may be important to differentiate between these
 ASVs. Therefore, ASVs with the same taxonomy need to be assigned unique
 label to differentiate between them. `label_duplicate_taxa` identifies
 identical taxa and assigns either a count or the ASV name (taken from
-`row.names(tax_table(ps_obj))`) to these taxa. By default, it does this
-at the lowest available taxonomic level, but if a `tax_level` rank is
-specified, it will only do it at that rank.
+`row.names(tax_table(ps_obj))`) to these taxa.
 
 ``` r
 # Label the lowest non-NA level
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj)
+ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
+                               tax_level = "Species")
 tax_table(ps_tmp)  %>%
   kable(format = "markdown")
 ```
@@ -527,43 +522,22 @@ tax_table(ps_tmp)  %>%
 |:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:---------------|:--------------------------|
 | 549322 | Other    | Other          | Other               | Other             | Other              | Other          | Other                     |
 | 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA             | NA                        |
-| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles 1   | NA                 | NA             | NA                        |
-| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles 2   | NA                 | NA             | NA                        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
 | 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum | NA                        |
 | 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
 | 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
 | 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
-| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 1  | NA                        |
-| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 2  | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
 | 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
 
 ``` r
 # Use ASVs as ids rather than counts
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
+ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
+                               tax_level = "Species",
                                asv_as_id = T, 
                                duplicate_label = "<tax> ASV <id>")
-tax_table(ps_tmp) %>%
-  kable(format = "markdown")
-```
-
-|        | Kingdom  | Phylum         | Class               | Order                    | Family             | Genus                  | Species                   |
-|:-------|:---------|:---------------|:--------------------|:-------------------------|:-------------------|:-----------------------|:--------------------------|
-| 549322 | Other    | Other          | Other               | Other                    | Other              | Other                  | Other                     |
-| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales          | ACK-M1             | NA                     | NA                        |
-| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles ASV 317182 | NA                 | NA                     | NA                        |
-| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles ASV 549656 | NA                 | NA                     | NA                        |
-| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales               | Nostocaceae        | Dolichospermum         | NA                        |
-| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales             | Neisseriaceae      | Neisseria              | NA                        |
-| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales           | Pasteurellaceae    | Haemophilus            | Haemophilusparainfluenzae |
-| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales        | Enterobacteriaceae | Providencia            | NA                        |
-| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales            | Bacteroidaceae     | Bacteroides ASV 158660 | NA                        |
-| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales            | Bacteroidaceae     | Bacteroides ASV 331820 | NA                        |
-| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales          | Streptococcaceae   | Streptococcus          | Streptococcussanguinis    |
-
-``` r
-# Label at Genus level
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
-                               tax_level = "Genus")
 tax_table(ps_tmp) %>%
   kable(format = "markdown")
 ```
@@ -578,8 +552,8 @@ tax_table(ps_tmp) %>%
 | 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
 | 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
 | 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
-| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 1  | NA                        |
-| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 2  | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
 | 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
 
 ### `move_label` & `move_nested_labels`
@@ -596,7 +570,7 @@ bottom of the plot using `pos = Inf`.
 ``` r
 # Turn physeq object into a dataframe
 ps_tmp <- name_na_taxa(ps_tmp)
-ps_tmp <- label_duplicate_taxa(ps_tmp)
+ps_tmp <- label_duplicate_taxa(ps_tmp, tax_level = "Species")
 psdf <- psmelt(ps_tmp)
 levels(as.factor(psdf$Phylum))
 #> [1] "Actinobacteria" "Bacteroidetes"  "Cyanobacteria"  "Firmicutes"    
@@ -619,7 +593,7 @@ order of the two `Unknown Bacteroides`.
 levels(as.factor(psdf$Species))
 #>  [1] "Haemophilusparainfluenzae"       "Other"                          
 #>  [3] "Streptococcussanguinis"          "Unknown ACK-M1 (Family)"        
-#>  [5] "Unknown Bacteroides 1 (Genus)"   "Unknown Bacteroides 2 (Genus)"  
+#>  [5] "Unknown Bacteroides (Genus) 1"   "Unknown Bacteroides (Genus) 2"  
 #>  [7] "Unknown Dolichospermum (Genus)"  "Unknown Neisseria (Genus)"      
 #>  [9] "Unknown Providencia (Genus)"     "Unknown Stramenopiles (Order) 1"
 #> [11] "Unknown Stramenopiles (Order) 2"
@@ -630,8 +604,8 @@ psdf <- move_nested_labels(psdf,
                            nested_label = "Unknown Bacteroides 1",
                            pos = Inf)
 levels(psdf$Species)
-#>  [1] "Unknown ACK-M1 (Family)"         "Unknown Bacteroides 2 (Genus)"  
-#>  [3] "Unknown Bacteroides 1 (Genus)"   "Unknown Dolichospermum (Genus)" 
+#>  [1] "Unknown ACK-M1 (Family)"         "Unknown Bacteroides (Genus) 1"  
+#>  [3] "Unknown Bacteroides (Genus) 2"   "Unknown Dolichospermum (Genus)" 
 #>  [5] "Unknown Stramenopiles (Order) 1" "Unknown Stramenopiles (Order) 2"
 #>  [7] "Streptococcussanguinis"          "Haemophilusparainfluenzae"      
 #>  [9] "Unknown Neisseria (Genus)"       "Unknown Providencia (Genus)"    
@@ -662,7 +636,7 @@ p <- p + geom_col(position = position_fill(), width = 0.5)
 p
 ```
 
-![](man/figures/README-unnamed-chunk-22-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-21-1.png)<!-- -->
 
 #### Alternative plot types
 
@@ -692,7 +666,7 @@ p <- ggnested(psdf_rel,
 p + geom_boxplot(alpha = 0.5)
 ```
 
-![](man/figures/README-unnamed-chunk-23-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-22-1.png)<!-- -->
 
 ## What happened to `fantaxtic_bar`?
 
@@ -708,4 +682,4 @@ ps_tmp <- name_taxa(ps_tmp, label = "Unkown", species = T, other_label = "Other"
 fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
 ```
 
-![](man/figures/README-unnamed-chunk-24-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-23-1.png)<!-- -->
