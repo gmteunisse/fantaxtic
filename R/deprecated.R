@@ -238,7 +238,7 @@ gen_palette <- function(clr_tbl, clr_pal = NULL, base_clr = "#6495ed"){
 #' fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Species", other_label = "Other")
 #'
 #' #Generate a barplot that is colored by Phylum and lebeled by Species. As multiple
-#' ASVs have the same family annotation, generate unique labels.
+#' # ASVs have the same family annotation, generate unique labels.
 #' fantaxtic_bar(ps_tmp, color_by = "Phylum", label_by = "Family", other_label = "Other",
 #'               gen_uniq_lbls = TRUE)
 #'

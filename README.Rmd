@@ -338,31 +338,25 @@ tax_table(ps_tmp) %>%
 ```
 
 ### `label_duplicate_taxa`
-Another issue is that a single taxon may be represented by multiple ASVs, especially when low-rank annotations such as Species are missing. For some studies, it may be important to differentiate between these ASVs. Therefore, ASVs with the same taxonomy need to be assigned unique label to differentiate between them. `label_duplicate_taxa` identifies identical taxa and assigns either a count or the ASV name (taken from `row.names(tax_table(ps_obj))`) to these taxa. By default, it does this at the lowest available taxonomic level, but if a `tax_level` rank is specified, it will only do it at that rank.
+Another issue is that a single taxon may be represented by multiple ASVs, especially when low-rank annotations such as Species are missing. For some studies, it may be important to differentiate between these ASVs. Therefore, ASVs with the same taxonomy need to be assigned unique label to differentiate between them. `label_duplicate_taxa` identifies identical taxa and assigns either a count or the ASV name (taken from `row.names(tax_table(ps_obj))`) to these taxa.
 
 ```{r}
 # Label the lowest non-NA level
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj)
+ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
+                               tax_level = "Species")
 tax_table(ps_tmp)  %>%
   kable(format = "markdown")
 ```
 
 ```{r}
 # Use ASVs as ids rather than counts
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
+ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
+                               tax_level = "Species",
                                asv_as_id = T, 
                                duplicate_label = "<tax> ASV <id>")
 tax_table(ps_tmp) %>%
   kable(format = "markdown")
 
-```
-
-```{r}
-# Label at Genus level
-ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
-                               tax_level = "Genus")
-tax_table(ps_tmp) %>%
-  kable(format = "markdown")
 ```
 
 ### `move_label` & `move_nested_labels`
@@ -371,7 +365,7 @@ tax_table(ps_tmp) %>%
 ```{r}
 # Turn physeq object into a dataframe
 ps_tmp <- name_na_taxa(ps_tmp)
-ps_tmp <- label_duplicate_taxa(ps_tmp)
+ps_tmp <- label_duplicate_taxa(ps_tmp, tax_level = "Species")
 psdf <- psmelt(ps_tmp)
 levels(as.factor(psdf$Phylum))
 
