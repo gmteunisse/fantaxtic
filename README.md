@@ -535,26 +535,26 @@ tax_table(ps_tmp)  %>%
 ``` r
 # Use ASVs as ids rather than counts
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj,
-                               tax_level = "Species",
+                               tax_level = "Genus",
                                asv_as_id = T, 
                                duplicate_label = "<tax> ASV <id>")
 tax_table(ps_tmp) %>%
   kable(format = "markdown")
 ```
 
-|        | Kingdom  | Phylum         | Class               | Order             | Family             | Genus          | Species                   |
-|:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:---------------|:--------------------------|
-| 549322 | Other    | Other          | Other               | Other             | Other              | Other          | Other                     |
-| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA             | NA                        |
-| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
-| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA             | NA                        |
-| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum | NA                        |
-| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
-| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
-| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
-| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
-| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
-| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
+|        | Kingdom  | Phylum         | Class               | Order             | Family             | Genus                  | Species                   |
+|:-------|:---------|:---------------|:--------------------|:------------------|:-------------------|:-----------------------|:--------------------------|
+| 549322 | Other    | Other          | Other               | Other             | Other              | Other                  | Other                     |
+| 329744 | Bacteria | Actinobacteria | Actinobacteria      | Actinomycetales   | ACK-M1             | NA                     | NA                        |
+| 317182 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA                     | NA                        |
+| 549656 | Bacteria | Cyanobacteria  | Chloroplast         | Stramenopiles     | NA                 | NA                     | NA                        |
+| 279599 | Bacteria | Cyanobacteria  | Nostocophycideae    | Nostocales        | Nostocaceae        | Dolichospermum         | NA                        |
+| 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria              | NA                        |
+| 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus            | Haemophilusparainfluenzae |
+| 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia            | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides ASV 158660 | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides ASV 331820 | NA                        |
+| 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus          | Streptococcussanguinis    |
 
 ### `move_label` & `move_nested_labels`
 
@@ -569,7 +569,7 @@ bottom of the plot using `pos = Inf`.
 
 ``` r
 # Turn physeq object into a dataframe
-ps_tmp <- name_na_taxa(ps_tmp)
+ps_tmp <- name_na_taxa(top_asv$ps_obj)
 ps_tmp <- label_duplicate_taxa(ps_tmp, tax_level = "Species")
 psdf <- psmelt(ps_tmp)
 levels(as.factor(psdf$Phylum))
