@@ -513,7 +513,7 @@ identical taxa and assigns either a count or the ASV name (taken from
 ``` r
 # Label the lowest non-NA level
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
-                               tax_level = "Species")
+                               tax_level = "Genus")
 tax_table(ps_tmp)  %>%
   kable(format = "markdown")
 ```
@@ -528,8 +528,8 @@ tax_table(ps_tmp)  %>%
 | 360229 | Bacteria | Proteobacteria | Betaproteobacteria  | Neisseriales      | Neisseriaceae      | Neisseria      | NA                        |
 | 94166  | Bacteria | Proteobacteria | Gammaproteobacteria | Pasteurellales    | Pasteurellaceae    | Haemophilus    | Haemophilusparainfluenzae |
 | 550960 | Bacteria | Proteobacteria | Gammaproteobacteria | Enterobacteriales | Enterobacteriaceae | Providencia    | NA                        |
-| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
-| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides    | NA                        |
+| 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 1  | NA                        |
+| 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides 2  | NA                        |
 | 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus  | Streptococcussanguinis    |
 
 ``` r

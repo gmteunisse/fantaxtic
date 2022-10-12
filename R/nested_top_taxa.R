@@ -110,6 +110,7 @@ nested_top_taxa <- function(ps_obj,
   # Get the top n top_tax_level taxa
   top_top <- top_taxa(ps_obj, tax_level = top_tax_level, n_taxa = n_top_taxa,
                       by_proportion = by_proportion, ...)$top_taxa
+                      #by_proportion = by_proportion)$top_taxa
 
   # Extract the taxonomy of to the top_tax_level and collapse all others
   ranks <- tax_ranks[1:which(tax_ranks == top_tax_level)]
@@ -179,6 +180,7 @@ nested_top_taxa <- function(ps_obj,
 
     # Get the top n nested_tax_level taxa
     top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...)$top_taxa %>%
+    #top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion)$top_taxa %>%
       suppressWarnings()
 
     # Merge all other taxa, including the NA taxa
@@ -192,7 +194,11 @@ nested_top_taxa <- function(ps_obj,
     to_merge <- c(to_merge, na_taxids)
     ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge, 1) %>%
       suppressWarnings()
-    merged_ids <- c(merged_ids, to_merge[1])
+
+    # Store the merged ids
+    if(length(to_merge) > 0 ){
+      merged_ids <- c(merged_ids, to_merge[1])
+    }
   }
 
   # Combine the results
@@ -211,15 +217,19 @@ nested_top_taxa <- function(ps_obj,
     suppressMessages()
 
   # Update the taxon name to nested_merged_label
-  tax_tbl <- phyloseq::tax_table(ps_obj_nest)
+  tax_tbl <- phyloseq::tax_table(ps_obj_nest) %>%
+    as.data.frame() %>%
+    as.matrix()
   for (i in merged_ids){
     lab <- gsub("<tax>", tax_tbl[i,top_tax_level], nested_merged_label)
     tax_tbl[i, is.na(tax_tbl[i,])] <- lab
   }
-  phyloseq::tax_table(ps_obj_nest) <- tax_tbl
+  phyloseq::tax_table(ps_obj_nest) <- tax_table(tax_tbl)
 
   # Return a list of top and merged values
   return(list(ps_obj = ps_obj_nest,
               top_taxa = top))
 
 }
+
+

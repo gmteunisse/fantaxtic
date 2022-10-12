@@ -343,7 +343,7 @@ Another issue is that a single taxon may be represented by multiple ASVs, especi
 ```{r}
 # Label the lowest non-NA level
 ps_tmp <- label_duplicate_taxa(top_asv$ps_obj, 
-                               tax_level = "Species")
+                               tax_level = "Genus")
 tax_table(ps_tmp)  %>%
   kable(format = "markdown")
 ```
