@@ -136,45 +136,43 @@ nested_top_taxa <- function(ps_obj,
   }
 
   # Loop through each top_tax_level and get the top n nested_tax_level taxa
-  lvls <- unique(top_top[,top_tax_level])
+  lvls <- unique(taxa$full_taxonomy)
   top_nest <- list()
   merged_ids <- c()
   for (lvl in lvls){
 
     # Get the taxids of all nested_taxa within the current top_level taxon.
-    # Do not include taxa where nested_level is NA
-    taxids <- tax_table(ps_obj_nest) %>%
-      data.frame(taxid = row.names(.)) %>%
-      filter(!!as.symbol(top_tax_level) == lvl,
-             !is.na(!!as.symbol(nested_tax_level))) %>%
+    all_taxids <- taxa %>%
+      filter(full_taxonomy == lvl) %>%
+      row.names(.)
+    all_taxids <- all_taxids[all_taxids %in% taxa_names(ps_obj_nest)]
+
+    # Select named taxa only
+    named_taxids <- tax_table(ps_obj_nest) %>%
+     data.frame(taxid = row.names(.)) %>%
+      filter(taxid %in% all_taxids,
+             !is.na(!!as.symbol(nested_tax_level))
+             ) %>%
       pull(taxid)
 
-    # If no nested_level annotations are available, do include taxa
-    # where nested_level is NA
-    if (length(taxids) == 0){
-      taxids <- tax_table(ps_obj_nest) %>%
-        data.frame(taxid = row.names(.)) %>%
-        filter(!!as.symbol(top_tax_level) == lvl) %>%
-        pull(taxid)
+    # Get the top taxa
+    if (length(named_taxids) != 0){
+
+      # Remove all other taxa
+      ps_obj_tmp <- collapse_taxa(ps_obj_nest, named_taxids, discard_other = T) %>%
+        suppressWarnings()
+
+      # Get the top n nested_tax_level taxa
+      top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...)$top_taxa %>%
+        suppressWarnings()
+
+      # Find all taxa to merge
+      to_merge <- all_taxids[!all_taxids %in% top_nest[[lvl]]$taxid]
+    } else {
+      to_merge <- all_taxids
     }
 
-    # Remove all other taxa
-    ps_obj_tmp <- collapse_taxa(ps_obj_nest, taxids, discard_other = T) %>%
-      suppressWarnings()
-
-    # Get the top n nested_tax_level taxa
-    top_nest[[lvl]] <- top_taxa(ps_obj_tmp, n_taxa = n_nested_taxa, by_proportion = by_proportion, ...)$top_taxa %>%
-      suppressWarnings()
-
-    # Merge all other taxa, including the NA taxa
-    to_merge <- taxa_names(ps_obj_tmp) %>%
-      .[!. %in% top_nest[[lvl]]$taxid]
-    na_taxids <- tax_table(ps_obj_nest) %>%
-      data.frame(taxid = row.names(.)) %>%
-      filter(!!as.symbol(top_tax_level) == lvl,
-             is.na(!!as.symbol(nested_tax_level))) %>%
-      pull(taxid)
-    to_merge <- c(to_merge, na_taxids)
+    # Merge the non-top taxa within this top-level taxon
     ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge, 1) %>%
       suppressWarnings()
 
@@ -214,5 +212,7 @@ nested_top_taxa <- function(ps_obj,
               top_taxa = top))
 
 }
+
+
 
 
