@@ -124,6 +124,8 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
           filter(!!sym(tax_level) == merged_label) %>%
           pull(taxid)
       }
+    } else {
+      ps_tmp <- ps_obj
     }
   } else {
     ps_tmp <- ps_obj
@@ -143,6 +145,9 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
     ps_long <- ps_long %>%
       group_by(sample_id) %>%
       mutate(abundance = abundance / sum(abundance))
+
+    # Set NaNs to 0
+    ps_long[is.nan(ps_long$abundance),'abundance'] <- 0
   }
 
   # Get the top taxa
