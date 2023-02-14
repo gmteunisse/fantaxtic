@@ -124,6 +124,8 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
           filter(!!sym(tax_level) == merged_label) %>%
           pull(taxid)
       }
+    } else {
+      ps_tmp <- ps_obj
     }
   } else {
     ps_tmp <- ps_obj
