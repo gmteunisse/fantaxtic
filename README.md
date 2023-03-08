@@ -30,6 +30,7 @@ if(!"devtools" %in% installed.packages()){
   install.packages("devtools")
 }
 devtools::install_github("gmteunisse/fantaxtic")
+devtools::install_github("gmteunisse/ggnested")
 ```
 
 ## Basic usage
