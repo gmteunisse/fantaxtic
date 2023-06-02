@@ -33,6 +33,12 @@ devtools::install_github("gmteunisse/fantaxtic")
 devtools::install_github("gmteunisse/ggnested")
 ```
 
+## Citation
+Please use the citation below. For BibTeX, us the 'Cite this repository' button.
+```
+Teunisse, G. M. (2022). Fantaxtic - Nested Bar Plots for Phyloseq Data (Version 2.0.1) [Computer software]. https://github.com/gmteunisse/Fantaxtic
+```
+
 ## Basic usage
 
 The workflow consists of two parts:
