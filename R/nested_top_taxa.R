@@ -111,7 +111,7 @@ nested_top_taxa <- function(ps_obj,
   top_top <- top_taxa(ps_obj, tax_level = top_tax_level, n_taxa = n_top_taxa,
                       by_proportion = by_proportion, ...)$top_taxa
   ranks <- tax_ranks[1:which(tax_ranks == top_tax_level)]
-  top_top_taxa <- apply(top_top[,ranks], 1, paste, collapse = '_')
+  top_top_taxa <- apply(top_top[,ranks,drop=FALSE], 1, paste, collapse = '_')
 
   # Extract the taxonomy of the top_tax_level and collapse all others
   taxa <- tax_table(ps_obj) %>%
@@ -171,6 +171,7 @@ nested_top_taxa <- function(ps_obj,
     } else {
       to_merge <- all_taxids
     }
+
 
     # Merge the non-top taxa within this top-level taxon
     ps_obj_nest <- merge_taxa(ps_obj_nest, to_merge, 1) %>%
