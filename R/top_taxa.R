@@ -133,8 +133,7 @@ top_taxa <- function(ps_obj, tax_level = NULL, n_taxa = 1, grouping = NULL,
 
   # Convert to long
   ps_long <- otu_table(ps_tmp) %>%
-    data.frame(taxid = row.names(.)) %>%
-    rename_with(function(x){gsub("X", "", x)}) %>%
+    data.frame(taxid = row.names(.), check.names = F) %>%
     pivot_longer(!taxid, names_to = "sample_id", values_to = "abundance") %>%
     left_join(sample_data(ps_tmp) %>%
                 data.frame(sample_id = row.names(.)),
