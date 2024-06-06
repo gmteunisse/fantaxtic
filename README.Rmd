@@ -215,10 +215,6 @@ nested_level <- "Species"
 sample_order <- NULL
 top_asv <- top_taxa(GlobalPatterns, n_taxa = 10)
 
-# Generate a palette based  on the phyloseq object
-pal <- taxon_colours(top_asv$ps_obj,
-                     tax_level = top_level)
-
 # Create names for NA taxa
 ps_tmp <- top_asv$ps_obj %>%
   name_na_taxa()
@@ -226,6 +222,10 @@ ps_tmp <- top_asv$ps_obj %>%
 # Add labels to taxa with the same names
 ps_tmp <- ps_tmp %>%
   label_duplicate_taxa(tax_level = nested_level)
+
+# Generate a palette basedon the phyloseq object
+pal <- taxon_colours(ps_tmp,
+                     tax_level = top_level)
 
 # Convert physeq to df
 psdf <- psmelt(ps_tmp)
@@ -272,6 +272,26 @@ p
 
 ```
 
+
+### `name_na_taxa`
+More often than not, ASVs will not have a complete taxonomic annotation down to the species level. In phyloseq object, this results in `NA` for any unavailable taxonomic rank. This creates issues when trying to plot at a low taxonomic rank such as Species. `name_na_taxa` resolves this problem by assigning the name of the lowest known taxonomic rank for every `NA` value in each ASV. To make it clear that the newly inferred name is not specific to the rank, it includes the rank from which the name was inferred in the new name. This can be turned off by setting `include_rank = F`.
+
+```{r}
+# Fill in names for NA taxa, including their rank
+ps_tmp <- name_na_taxa(top_asv$ps_obj)
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
+```
+
+```{r}
+# Leave the rank out and alter the label
+ps_tmp <- name_na_taxa(top_asv$ps_obj, 
+                       include_rank = F, 
+                       na_label = "NA <tax>")
+tax_table(ps_tmp) %>%
+  kable(format = "markdown")
+```
+
 ### `taxon_colours`
 This function generates a colour for each taxon at a specified rank in a phyloseq object. Custom palettes can also be provided, and if they are named, colours wil be assigned appropriately.
 
@@ -316,25 +336,6 @@ p3 <- plot_colours(pal3) +
   ggtitle("Incomplete custom palette")
 grid.arrange(p1, p2, p3, nrow = 1)
 
-```
-
-### `name_na_taxa`
-More often than not, ASVs will not have a complete taxonomic annotation down to the species level. In phyloseq object, this results in `NA` for any unavailable taxonomic rank. This creates issues when trying to plot at a low taxonomic rank such as Species. `name_na_taxa` resolves this problem by assigning the name of the lowest known taxonomic rank for every `NA` value in each ASV. To make it clear that the newly inferred name is not specific to the rank, it includes the rank from which the name was inferred in the new name. This can be turned off by setting `include_rank = F`.
-
-```{r}
-# Fill in names for NA taxa, including their rank
-ps_tmp <- name_na_taxa(top_asv$ps_obj)
-tax_table(ps_tmp) %>%
-  kable(format = "markdown")
-```
-
-```{r}
-# Leave the rank out and alter the label
-ps_tmp <- name_na_taxa(top_asv$ps_obj, 
-                       include_rank = F, 
-                       na_label = "NA <tax>")
-tax_table(ps_tmp) %>%
-  kable(format = "markdown")
 ```
 
 ### `label_duplicate_taxa`

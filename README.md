@@ -30,13 +30,6 @@ if(!"devtools" %in% installed.packages()){
   install.packages("devtools")
 }
 devtools::install_github("gmteunisse/fantaxtic")
-devtools::install_github("gmteunisse/ggnested")
-```
-
-## Citation
-Please use the citation below. For BibTeX, us the 'Cite this repository' button.
-```
-Teunisse, G. M. (2022). Fantaxtic - Nested Bar Plots for Phyloseq Data (Version 2.0.1) [Computer software]. https://github.com/gmteunisse/Fantaxtic
 ```
 
 ## Basic usage
@@ -343,10 +336,6 @@ nested_level <- "Species"
 sample_order <- NULL
 top_asv <- top_taxa(GlobalPatterns, n_taxa = 10)
 
-# Generate a palette based  on the phyloseq object
-pal <- taxon_colours(top_asv$ps_obj,
-                     tax_level = top_level)
-
 # Create names for NA taxa
 ps_tmp <- top_asv$ps_obj %>%
   name_na_taxa()
@@ -354,6 +343,10 @@ ps_tmp <- top_asv$ps_obj %>%
 # Add labels to taxa with the same names
 ps_tmp <- ps_tmp %>%
   label_duplicate_taxa(tax_level = nested_level)
+
+# Generate a palette basedon the phyloseq object
+pal <- taxon_colours(ps_tmp,
+                     tax_level = top_level)
 
 # Convert physeq to df
 psdf <- psmelt(ps_tmp)
@@ -400,56 +393,6 @@ p
 ```
 
 ![](man/figures/README-unnamed-chunk-13-1.png)<!-- -->
-
-### `taxon_colours`
-
-This function generates a colour for each taxon at a specified rank in a
-phyloseq object. Custom palettes can also be provided, and if they are
-named, colours wil be assigned appropriately.
-
-``` r
-# Function to plot the colours in a palette
-plot_colours <- function(pal){
-  pal %>%
-    data.frame(name = names(.),
-               colour = .) %>%
-    ggplot(aes(x = 1,
-               y = name,
-               fill = colour,
-               label = paste(name, "-", colour))) +
-    geom_tile() +
-    geom_text() +
-    scale_fill_identity() +
-    scale_x_discrete(expand = c(0,0)) +
-    scale_y_discrete(expand = c(0,0)) +
-    theme(axis.text = element_blank(),
-          axis.title = element_blank(),
-          axis.ticks = element_blank(),
-          plot.title = element_text(hjust = 0.5,
-                                    size = 12))
-}
-
-# Get top taxa and generate a palette
-pal <- taxon_colours(top_asv$ps_obj, tax_level = "Phylum")
-p1 <- plot_colours(pal) +
-  ggtitle("Default")
-
-# Generate a palette with a different base_clr
-pal2 <- taxon_colours(top_asv$ps_obj, tax_level = "Phylum", base_clr = "blue")
-p2 <- plot_colours(pal2) +
-  ggtitle("Base colour blue")
-
-# Provide a custom incomplete palette
-pal3 <- taxon_colours(top_asv$ps_obj, 
-                     tax_level = "Phylum", 
-                     palette = c(Cyanobacteria = "blue", 
-                                 Bacteroidetes = "pink"))
-p3 <- plot_colours(pal3) +
-  ggtitle("Incomplete custom palette")
-grid.arrange(p1, p2, p3, nrow = 1)
-```
-
-![](man/figures/README-unnamed-chunk-14-1.png)<!-- -->
 
 ### `name_na_taxa`
 
@@ -506,6 +449,56 @@ tax_table(ps_tmp) %>%
 | 158660 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | NA Bacteroides            |
 | 331820 | Bacteria | Bacteroidetes  | Bacteroidia         | Bacteroidales     | Bacteroidaceae     | Bacteroides      | NA Bacteroides            |
 | 98605  | Bacteria | Firmicutes     | Bacilli             | Lactobacillales   | Streptococcaceae   | Streptococcus    | Streptococcussanguinis    |
+
+### `taxon_colours`
+
+This function generates a colour for each taxon at a specified rank in a
+phyloseq object. Custom palettes can also be provided, and if they are
+named, colours wil be assigned appropriately.
+
+``` r
+# Function to plot the colours in a palette
+plot_colours <- function(pal){
+  pal %>%
+    data.frame(name = names(.),
+               colour = .) %>%
+    ggplot(aes(x = 1,
+               y = name,
+               fill = colour,
+               label = paste(name, "-", colour))) +
+    geom_tile() +
+    geom_text() +
+    scale_fill_identity() +
+    scale_x_discrete(expand = c(0,0)) +
+    scale_y_discrete(expand = c(0,0)) +
+    theme(axis.text = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5,
+                                    size = 12))
+}
+
+# Get top taxa and generate a palette
+pal <- taxon_colours(top_asv$ps_obj, tax_level = "Phylum")
+p1 <- plot_colours(pal) +
+  ggtitle("Default")
+
+# Generate a palette with a different base_clr
+pal2 <- taxon_colours(top_asv$ps_obj, tax_level = "Phylum", base_clr = "blue")
+p2 <- plot_colours(pal2) +
+  ggtitle("Base colour blue")
+
+# Provide a custom incomplete palette
+pal3 <- taxon_colours(top_asv$ps_obj, 
+                     tax_level = "Phylum", 
+                     palette = c(Cyanobacteria = "blue", 
+                                 Bacteroidetes = "pink"))
+p3 <- plot_colours(pal3) +
+  ggtitle("Incomplete custom palette")
+grid.arrange(p1, p2, p3, nrow = 1)
+```
+
+![](man/figures/README-unnamed-chunk-16-1.png)<!-- -->
 
 ### `label_duplicate_taxa`
 
