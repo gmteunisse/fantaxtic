@@ -110,14 +110,6 @@ plot_nested_bar <- function(ps_obj,
                             sample_order = NULL,
                             ...){
 
-  # Generate a palette
-  pal <- taxon_colours(ps_obj,
-                       tax_level = top_level,
-                       merged_label = top_merged_label,
-                       merged_clr = merged_clr,
-                       palette = palette,
-                       base_clr = base_clr)
-
   # Create labels
   ps_tmp <- ps_obj %>%
     name_na_taxa(include_rank = include_rank,
@@ -126,6 +118,14 @@ plot_nested_bar <- function(ps_obj,
     label_duplicate_taxa(tax_level = nested_level,
                          asv_as_id = asv_as_id,
                          duplicate_label = duplicate_taxon_label )
+
+  # Generate a palette
+  pal <- taxon_colours(ps_tmp,
+                       tax_level = top_level,
+                       merged_label = top_merged_label,
+                       merged_clr = merged_clr,
+                       palette = palette,
+                       base_clr = base_clr)
 
   # Convert physeq to df
   psdf <- psmelt(ps_tmp)
