@@ -1,7 +1,7 @@
 Package: fantaxtic
 Type: Package
 Title: Fantaxtic - nested bar plots for phyloseq data
-Version: 0.2.0
+Version: 0.2.1
 Author: person("Guus Martijn", "Teunisse", email = "gmteunisse@gmail.com",
     role = c("aut", "cre"))
 Maintainer: Guus Martijn Teunisse <gmteunisse@gmail.com>
